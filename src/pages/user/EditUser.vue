@@ -107,7 +107,7 @@
 import { ref, watch } from "vue";
 import { message } from "ant-design-vue";
 import { getUserById, updateUser } from "@/apis/userService";
-import { getAvatar, postAvatar } from "@/apis/userService";
+import { getAvatar, productAvatar } from "@/apis/userService";
 
 export default {
   props: {
@@ -176,7 +176,7 @@ export default {
 
         // Nếu có file được chọn thì upload avatar
         if (selectedFile.value) {
-          await postAvatar(userForm.value.id, selectedFile.value);
+          await productAvatar(userForm.value.id, selectedFile.value);
         }
 
         message.success("Cập nhật người dùng thành công!");

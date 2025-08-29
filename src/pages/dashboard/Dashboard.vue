@@ -7,7 +7,7 @@
         <p class="text-gray-600 text-sm">
           Hệ thống đang hoạt động ổn định! Bạn có
           <span class="text-indigo-600 font-semibold">
-            {{ pendingPostCount }} bài viết chưa duyệt!
+            {{ pendingProductCount }} bài viết chưa duyệt!
           </span>
         </p>
       </div>
@@ -87,12 +87,12 @@
             {{ summary?.totalPayments }}
           </span>
         </div>
-        <!-- Box: Total Posts -->
+        <!-- Box: Total Products -->
         <div class="bg-cyan-100 shadow rounded-xl p-4 flex flex-col">
           <IconFileText class="w-8 h-8 text-yellow-500 mb-2" />
           <span class="t font-semibold text-gray-600">Bài viết</span>
           <span class="text-2xl font-bold text-gray-800 mt-4">
-            {{ summary?.totalPosts }}
+            {{ summary?.totalProducts }}
           </span>
         </div>
         <!-- Box: Total Revenue -->
@@ -147,10 +147,10 @@ import {
 import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 import { LineChart, BarChart } from "vue-chart-3";
-import { getListPost } from "@/apis/postService";
+import { getListProduct } from "@/apis/productService";
 import { useAuthStore } from "@/stores/store";
 
-const pendingPostCount = ref(0);
+const pendingProductCount = ref(0);
 const authStore = useAuthStore();
 const fullName = computed(() => authStore.user?.fullName || "Người dùng");
 
@@ -180,13 +180,13 @@ const availableMonths = ref([
   { value: 12, label: "Tháng 12" },
 ]);
 
-async function fetchPendingPosts() {
+async function fetchPendingProducts() {
   try {
     // Truyền params: approved = true và notApproved = true
-    const res = await getListPost({ approved: true, notApproved: true });
+    const res = await getListProduct({ approved: true, notApproved: true });
 
     // Giả sử API trả về danh sách bài viết trong res.data
-    pendingPostCount.value = res.data?.total || 0;
+    pendingProductCount.value = res.data?.total || 0;
   } catch (error) {
     console.error("Lỗi khi lấy bài viết chưa duyệt:", error);
   }
@@ -246,7 +246,7 @@ const transactionChartOptions = ref({
 onMounted(async () => {
   await fetchSummary();
   await fetchRevenueAndBuildData();
-  await fetchPendingPosts();
+  await fetchPendingProducts();
 });
 
 // Watch thay đổi

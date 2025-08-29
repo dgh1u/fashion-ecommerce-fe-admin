@@ -1,11 +1,11 @@
 import axios from "@/axios";
 
-export const uploadDocument = async (postId, file) => {
+export const uploadDocument = async (productId, file) => {
   const formData = new FormData();
   formData.append("file", file);
 
   return axios({
-    url: `/api/document/upload/${postId}`,
+    url: `/api/document/upload/${productId}`,
     method: "POST",
     data: formData,
     headers: {
@@ -14,9 +14,9 @@ export const uploadDocument = async (postId, file) => {
   });
 };
 
-export const getDocumentsByPost = async (postId) => {
+export const getDocumentsByPost = async (productId) => {
   return axios({
-    url: `/api/documents/${postId}`,
+    url: `/api/documents/${productId}`,
     method: "GET",
   });
 };

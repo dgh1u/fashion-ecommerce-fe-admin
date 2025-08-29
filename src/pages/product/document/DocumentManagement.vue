@@ -1,9 +1,9 @@
 <template>
   <div class="p-4 pt-12">
-    <FoodBeverageDetail
-      v-if="selectedPostId"
-      v-model:open="showFoodBeverageDetailPopup"
-      :postId="selectedPostId"
+    <DocumentDetail
+      v-if="selectedProductId"
+      v-model:open="showDocumentDetailPopup"
+      :productId="selectedProductId"
     />
 
     <div class="flex items-center justify-between mb-4">
@@ -22,53 +22,31 @@
           </template>
         </a-input>
 
-        <!-- Bộ lọc Loại hình -->
+        <!-- Bộ lọc Phân loại Tài liệu -->
         <a-select
-          v-model:value="selectedFoodBeverageType"
-          placeholder="Loại hình"
-          style="width: 120px"
-          @change="handleFilterChange"
-        >
-          <a-select-option :value="null">Tất cả</a-select-option>
-          <a-select-option :value="'QUAN_AN'">Quán ăn</a-select-option>
-          <a-select-option :value="'QUAN_NUOC'">Quán nước</a-select-option>
-        </a-select>
-
-        <!-- Bộ lọc Phân loại Quán ăn - chỉ hiển thị khi chọn Quán ăn -->
-        <a-select
-          v-if="selectedFoodBeverageType === 'QUAN_AN'"
+          v-if="selectedDocumentType === 'TAI_LIEU'"
           v-model:value="selectedSecondMotel"
           placeholder="Phân loại"
           style="width: 150px"
           @change="handleFilterChange"
         >
-          <a-select-option :value="null">Tất cả</a-select-option>
-          <a-select-option value="Cơm">Cơm</a-select-option>
-          <a-select-option value="Món nước">Món nước</a-select-option>
-          <a-select-option value="Xôi và Bánh mì"
-            >Xôi và Bánh mì</a-select-option
+          <a-select-option value="Giáo trình">Giáo trình</a-select-option>
+          <a-select-option value="Sách tham khảo"
+            >Sách tham khảo</a-select-option
           >
-          <a-select-option value="Cháo">Cháo</a-select-option>
-          <a-select-option value="Ăn vặt">Ăn vặt</a-select-option>
-          <a-select-option value="Đồ ăn nhanh">Đồ ăn nhanh</a-select-option>
-          <a-select-option value="Quán nhậu">Quán nhậu</a-select-option>
-        </a-select>
-
-        <!-- Bộ lọc Phân loại - chỉ hiển thị khi chọn Quán ăn -->
-        <a-select
-          v-if="selectedFoodBeverageType === 'QUAN_NUOC'"
-          v-model:value="selectedSecondMotel"
-          placeholder="Phân loại"
-          style="width: 150px"
-          @change="handleFilterChange"
-        >
-          <a-select-option :value="null">Tất cả</a-select-option>
-          <a-select-option value="Quán Cà phê">Quán Cà phê</a-select-option>
-          <a-select-option value="Quán Trà chanh"
-            >Quán Trà chanh</a-select-option
+          <a-select-option value="Khóa luận tốt nghiệp"
+            >Khóa luận tốt nghiệp</a-select-option
           >
-          <a-select-option value="Trà đá vỉa hè">Trà đá vỉa hè</a-select-option>
-          <a-select-option value="Quán Trà sữa">Quán Trà sữa</a-select-option>
+          <a-select-option value="Báo cáo thực tập"
+            >Báo cáo thực tập</a-select-option
+          >
+          <a-select-option value="Nghiên cứu khoa học"
+            >Nghiên cứu khoa học</a-select-option
+          >
+          <a-select-option value="Bài báo khoa học"
+            >Bài báo khoa học</a-select-option
+          >
+          <a-select-option value="Tài liệu khác">Tài liệu khác</a-select-option>
         </a-select>
 
         <!-- Bộ lọc trạng thái -->
@@ -113,7 +91,7 @@
     <!-- Bảng danh sách bài viết -->
     <a-table
       :columns="columns"
-      :data-source="posts"
+      :data-source="products"
       :loading="loading"
       :pagination="pagination"
       row-key="id"
@@ -125,34 +103,28 @@
           {{ index + 1 + pagination.pageSize * (pagination.current - 1) }}
         </template>
 
-        <template v-if="column.key === 'motel'">
+        <template v-if="column.key === 'firstClass'">
           <span
             :style="{
               color:
                 record.accomodationDTO &&
-                record.accomodationDTO.motel === 'QUAN_AN'
+                record.accomodationDTO.firstClass === 'TAI_LIEU'
                   ? 'green'
-                  : record.accomodationDTO &&
-                    record.accomodationDTO.motel === 'QUAN_NUOC'
-                  ? 'red'
                   : 'black',
               fontWeight: 'bold',
             }"
           >
             {{
               record.accomodationDTO &&
-              record.accomodationDTO.motel === "QUAN_AN"
-                ? "Quán ăn"
-                : record.accomodationDTO &&
-                  record.accomodationDTO.motel === "QUAN_NUOC"
-                ? "Quán nước"
+              record.accomodationDTO.firstClass === "TAI_LIEU"
+                ? "Tài liệu"
                 : "Không xác định"
             }}
           </span>
         </template>
 
-        <template v-if="column.key === 'secondMotel'">
-          {{ record.accomodationDTO.secondMotel }}
+        <template v-if="column.key === 'secondClass'">
+          {{ record.accomodationDTO.secondClass }}
         </template>
 
         <!-- Tiêu đề -->
@@ -205,7 +177,7 @@
 
         <!-- Hành động -->
         <template v-if="column.key === 'action'">
-          <a-button type="link" @click="viewPost(record)">
+          <a-button type="link" @click="viewProduct(record)">
             <template #icon><EyeOutlined /></template>
           </a-button>
 
@@ -220,7 +192,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
-import { getListPost, deletePost } from "@/apis/postService";
+import { getListProduct, deleteProduct } from "@/apis/productService";
 import { message, Modal } from "ant-design-vue";
 import {
   PlusOutlined,
@@ -228,7 +200,7 @@ import {
   SearchOutlined,
   EyeOutlined,
 } from "@ant-design/icons-vue";
-import FoodBeverageDetail from "./FoodBeverageDetail.vue";
+import DocumentDetail from "./DocumentDetail.vue";
 
 export default {
   components: {
@@ -237,10 +209,10 @@ export default {
     DeleteOutlined,
     SearchOutlined,
 
-    FoodBeverageDetail,
+    DocumentDetail,
   },
   setup() {
-    const posts = ref([]);
+    const products = ref([]);
     const loading = ref(false);
     const searchText = ref("");
     const selectedStatus = ref(null);
@@ -250,11 +222,11 @@ export default {
       total: 0,
       showTotal: (total, range) => `Tổng cộng: ${total} bản ghi`,
     });
-    const showFoodBeverageDetailPopup = ref(false);
-    const selectedPostId = ref(null);
+    const showDocumentDetailPopup = ref(false);
+    const selectedProductId = ref(null);
     const selectedUserId = ref(null);
     const selectedDel = ref(null); // Định nghĩa lọc Hiển thị
-    const selectedFoodBeverageType = ref(null); // Định nghĩa lọc Loại hình
+    const selectedDocumentType = ref(null); // Định nghĩa lọc Loại hình
     const selectedSecondMotel = ref(null);
 
     // Cấu hình các cột cho bảng
@@ -263,8 +235,8 @@ export default {
       { title: "ID", dataIndex: "id", key: "id" },
 
       { title: "Tiêu đề", dataIndex: "title", key: "title" },
-      { title: "Loại hình", dataIndex: "motel", key: "motel" },
-      { title: "Phân loại", dataIndex: "secondMotel", key: "secondMotel" },
+      { title: "Loại hình", dataIndex: "firstClass", key: "firstClass" },
+      { title: "Phân loại", dataIndex: "secondClass", key: "secondClass" },
       { title: "Ngày tạo", dataIndex: "createAt", key: "createAt" },
       { title: "Trạng thái", key: "approved" },
       { title: "Người đăng", key: "user" },
@@ -274,7 +246,7 @@ export default {
     ];
 
     // Fetch danh sách bài viết từ API
-    const fetchPosts = async () => {
+    const fetchProducts = async () => {
       loading.value = true;
       try {
         const params = {
@@ -310,26 +282,20 @@ export default {
           params.del = selectedDel.value;
         }
 
-        // Lọc theo Loại hình (accomodationDTO.motel)
-        if (selectedFoodBeverageType.value === "QUAN_AN") {
-          params.motel = "QUAN_AN";
-        } else if (selectedFoodBeverageType.value === "QUAN_NUOC") {
-          params.motel = "QUAN_NUOC";
-        } else {
-          // Nếu không chọn lọc cụ thể, gửi cả hai giá trị
-          params.motels = "QUAN_AN,QUAN_NUOC";
-        }
+        // Lọc theo Loại hình (accomodationDTO.firstClass)
+
+        params.firstClass = "TAI_LIEU";
 
         if (selectedSecondMotel.value) {
-          params.secondMotel = selectedSecondMotel.value;
+          params.secondClass = selectedSecondMotel.value;
         }
 
         // Log dữ liệu lọc gửi đi
         console.log("Params gửi đi:", params);
-        const res = await getListPost(params);
+        const res = await getListProduct(params);
 
         if (res.data && res.data.items) {
-          posts.value = res.data.items;
+          products.value = res.data.items;
           pagination.value.total = res.data.total || 0;
         } else {
           throw new Error("Dữ liệu API không hợp lệ");
@@ -345,24 +311,24 @@ export default {
     const handleTableChange = (paginationObj) => {
       pagination.value.current = Math.max(paginationObj.current, 1);
       pagination.value.pageSize = paginationObj.pageSize;
-      fetchPosts();
+      fetchProducts();
     };
 
     // Xử lý khi người dùng tìm kiếm
     const handleSearch = () => {
       pagination.value.current = 1;
-      fetchPosts();
+      fetchProducts();
     };
 
     // Xử lý khi người dùng thay đổi bộ lọc
     const handleFilterChange = () => {
       pagination.value.current = 1;
-      fetchPosts();
+      fetchProducts();
     };
 
-    const viewPost = (record) => {
-      selectedPostId.value = record.id;
-      showFoodBeverageDetailPopup.value = true;
+    const viewProduct = (record) => {
+      selectedProductId.value = record.id;
+      showDocumentDetailPopup.value = true;
     };
 
     // Xác nhận và xóa bài viết
@@ -374,9 +340,9 @@ export default {
         cancelText: "Hủy",
         async onOk() {
           try {
-            await deletePost(record.id);
+            await deleteProduct(record.id);
             message.success("Xóa bài viết thành công");
-            fetchPosts();
+            fetchProducts();
           } catch {
             message.error("Xóa thất bại");
           }
@@ -384,27 +350,27 @@ export default {
       });
     };
 
-    onMounted(fetchPosts);
+    onMounted(fetchProducts);
 
     return {
-      posts,
+      products,
       columns,
       loading,
       searchText,
       selectedStatus,
       pagination,
-      fetchPosts,
+      fetchProducts,
       handleTableChange,
       handleSearch,
       handleFilterChange,
       confirmDelete,
-      viewPost,
+      viewProduct,
 
-      showFoodBeverageDetailPopup,
-      selectedPostId,
+      showDocumentDetailPopup,
+      selectedProductId,
 
       selectedUserId,
-      selectedFoodBeverageType,
+      selectedDocumentType,
       selectedDel,
       selectedSecondMotel,
     };

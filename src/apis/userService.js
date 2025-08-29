@@ -45,7 +45,7 @@ export const getAvatar = (id) => {
   });
 };
 
-export const postAvatar = (id, avatarFile) => {
+export const productAvatar = (id, avatarFile) => {
   const formData = new FormData();
   formData.append("avatar", avatarFile);
 

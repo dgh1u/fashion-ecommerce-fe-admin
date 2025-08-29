@@ -5,7 +5,7 @@
     @cancel="handleClose"
     width="800px"
   >
-    <div class="create-post space-y-4">
+    <div class="create-product space-y-4">
       <!-- Tiêu đề tin đăng -->
       <div class="block flex items-center justify-center">
         <span class="font-bold text-3xl text-teal-500">Chi tiết tin đăng</span>
@@ -379,14 +379,14 @@ import {
 } from "vue";
 import { message } from "ant-design-vue";
 import { Check as CheckIcon } from "lucide-vue-next";
-import { getDetailPost, approvePost } from "@/apis/postService.js";
+import { getDetailProduct, approveProduct } from "@/apis/productService.js";
 import { downloadDoc } from "@/apis/documentService.js";
 
 const documents = ref([]);
 
 const props = defineProps({
   open: { type: Boolean, default: false },
-  postId: { type: [String, Number], default: "" },
+  productId: { type: [String, Number], default: "" },
 });
 const emit = defineEmits(["update:open"]);
 
@@ -422,7 +422,7 @@ const formData = reactive({
   notApproved: false,
   del: false,
   accomodation: {
-    motel: "",
+    firstClass: "",
     secondMotel: "",
     address: "",
     idDistrict: "",
@@ -454,9 +454,9 @@ watch(
 
 // Computed property hiển thị Hình thức
 const displayMotel = computed(() => {
-  if (formData.accomodation.motel === "TAI_LIEU") return "Tài liệu";
+  if (formData.accomodation.firstClass === "TAI_LIEU") return "Tài liệu";
 
-  return formData.accomodation.motel;
+  return formData.accomodation.firstClass;
 });
 
 // Computed property cho trạng thái bài đăng
@@ -476,7 +476,7 @@ const displayVisibility = computed(() => (formData.del ? "Bị ẩn" : "Hiển t
 
 // Computed property định nghĩa màu chữ cho Hình thức
 const motelColor = computed(() => {
-  if (formData.accomodation.motel === "TAI_LIEU") return "text-green-500";
+  if (formData.accomodation.firstClass === "TAI_LIEU") return "text-green-500";
 
   return "";
 });
@@ -599,9 +599,9 @@ function getFileTypeText(fileTypeOrName) {
 // Hàm duyệt bài
 const handleApprove = async () => {
   try {
-    await approvePost(props.postId, true);
+    await approveProduct(props.productId, true);
     message.success("Bài đăng đã được duyệt");
-    fetchPostDetails(props.postId);
+    fetchProductDetails(props.productId);
   } catch (error) {
     console.error("Lỗi duyệt bài:", error);
     message.error("Lỗi duyệt bài");
@@ -611,9 +611,9 @@ const handleApprove = async () => {
 // Hàm khóa bài
 const handleBlock = async () => {
   try {
-    await approvePost(props.postId, false);
+    await approveProduct(props.productId, false);
     message.success("Bài đăng đã bị khóa");
-    fetchPostDetails(props.postId);
+    fetchProductDetails(props.productId);
   } catch (error) {
     console.error("Lỗi khóa bài:", error);
     message.error("Lỗi khóa bài");
@@ -621,9 +621,9 @@ const handleBlock = async () => {
 };
 
 // Hàm lấy chi tiết bài đăng
-const fetchPostDetails = async (id) => {
+const fetchProductDetails = async (id) => {
   try {
-    const response = await getDetailPost(id);
+    const response = await getDetailProduct(id);
     const data = response.data || {};
     formData.title = data.title || "";
     formData.content = data.content || "";
@@ -650,16 +650,16 @@ const fetchPostDetails = async (id) => {
 };
 
 onMounted(() => {
-  if (props.postId) {
-    fetchPostDetails(props.postId);
+  if (props.productId) {
+    fetchProductDetails(props.productId);
   }
 });
 
 watch(
-  () => props.postId,
-  (newPostId, oldPostId) => {
-    if (newPostId && newPostId !== oldPostId) {
-      fetchPostDetails(newPostId);
+  () => props.productId,
+  (newProductId, oldProductId) => {
+    if (newProductId && newProductId !== oldProductId) {
+      fetchProductDetails(newProductId);
     }
   }
 );

@@ -52,7 +52,7 @@
       </a-menu-item>
 
       <!-- Dropdown dạng Sidebar cho Bài Đăng -->
-      <a-sub-menu key="post">
+      <a-sub-menu key="product">
         <template #title>
           <span class="flex items-center gap-3">
             <FileText class="w-4 h-4" />
@@ -82,13 +82,13 @@ const menuItems = [
     label: "Bài đăng",
     icon: FileText,
     children: [
-      { label: "Tìm trọ", path: "/home/post/motel" },
-      { label: "Ăn uống", path: "/home/post/food-beverage" },
-      { label: "Cửa hàng & Tiện ích", path: "/home/post/store-utility" },
-      { label: "Tài liệu", path: "/home/post/document" },
+  
+      
+      { label: "Quần áo", path: "/home/product/document" },
     ],
   },
   { label: "Nạp tiền", path: "/home/payment", icon: Wallet },
+  { label: "Đăng sản phẩm", path: "/home/create-product", icon: Users },
 ];
 
 // Lọc menuItems thành 2 nhóm
@@ -101,5 +101,5 @@ const menuItemsWithChildren = computed(() =>
 
 // Điều khiển trạng thái mở rộng của sidebar
 const selectedKeys = ref(["dashboard"]);
-const openKeys = ref(["post"]);
+const openKeys = ref(["product"]);
 </script>

@@ -40,20 +40,20 @@
           <p class="text-base">
             <template v-if="action.action === 'CREATE'">
               <strong>{{ action.fullName }}</strong> đã tạo bài đăng
-              <span class="text-teal-500">{{ action.postTitle }}</span>
-              (ID: <span class="text-amber-500">{{ action.postId }}</span
+              <span class="text-teal-500">{{ action.productTitle }}</span>
+              (ID: <span class="text-amber-500">{{ action.productId }}</span
               >) đang chờ kiểm duyệt.
             </template>
             <template v-else-if="action.action === 'APPROVE'">
               <strong>ADMIN</strong> đã duyệt bài đăng
-              <span class="text-teal-500">{{ action.postTitle }}</span>
-              (ID: <span class="text-amber-500">{{ action.postId }}</span
+              <span class="text-teal-500">{{ action.productTitle }}</span>
+              (ID: <span class="text-amber-500">{{ action.productId }}</span
               >).
             </template>
             <template v-else-if="action.action === 'BLOCK'">
               <strong>ADMIN</strong> đã khóa bài đăng
-              <span class="text-teal-500">{{ action.postTitle }}</span>
-              (ID: <span class="text-amber-500">{{ action.postId }}</span
+              <span class="text-teal-500">{{ action.productTitle }}</span>
+              (ID: <span class="text-amber-500">{{ action.productId }}</span
               >).
             </template>
           </p>
@@ -78,7 +78,7 @@
 import { ref, onMounted } from "vue";
 import { Search, PlusCircle, CheckCircle2, XCircle } from "lucide-vue-next";
 import { getListAction } from "@/apis/actionService";
-import { getPostsByUserId } from "@/apis/postService"; // <-- API lấy post theo userId
+import { getProductsByUserId } from "@/apis/productService"; // <-- API lấy product theo userId
 
 const actions = ref([]);
 const filterUserId = ref("");
@@ -105,23 +105,23 @@ const fetchActions = async () => {
       pagination.value.total = result.total;
     } else {
       // Lấy tất cả bài đăng của user => limit cũng <= 50
-      const postRes = await getPostsByUserId(filterUserId.value.trim(), {
+      const productRes = await getProductsByUserId(filterUserId.value.trim(), {
         start: 0,
         limit: 50,
       });
-      const postData = postRes.data.data || postRes.data;
-      const postItems = postData.items || [];
+      const productData = productRes.data.data || productRes.data;
+      const productItems = productData.items || [];
 
-      // Gom mảng postId
-      const postIds = postItems.map((p) => p.id);
+      // Gom mảng productId
+      const productIds = productItems.map((p) => p.id);
       // Chuyển thành chuỗi CSV, vd: "39,38,29"
-      const postIdsCsv = postIds.join(",");
+      const productIdsCsv = productIds.join(",");
 
-      // Gọi getListAction với postIds kiểu CSV
+      // Gọi getListAction với productIds kiểu CSV
       const actionParams = {
         start: pagination.value.current - 1,
         limit: Math.min(pagination.value.pageSize, 50),
-        postIds: postIdsCsv, // "39,38,29"
+        productIds: productIdsCsv, // "39,38,29"
       };
       const actionRes = await getListAction(actionParams);
       const actionResult = actionRes.data.data || actionRes.data;
