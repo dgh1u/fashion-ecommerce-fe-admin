@@ -24,7 +24,7 @@
 
         <!-- Bộ lọc Phân loại Tài liệu -->
         <a-select
-          v-if="selectedDocumentType === 'TAI_LIEU'"
+          v-if="selectedDocumentType === 'QUAN_AO'"
           v-model:value="selectedSecondMotel"
           placeholder="Phân loại"
           style="width: 150px"
@@ -107,24 +107,23 @@
           <span
             :style="{
               color:
-                record.accomodationDTO &&
-                record.accomodationDTO.firstClass === 'TAI_LIEU'
+                record.criteriaDTO &&
+                record.criteriaDTO.firstClass === 'QUAN_AO'
                   ? 'green'
                   : 'black',
               fontWeight: 'bold',
             }"
           >
             {{
-              record.accomodationDTO &&
-              record.accomodationDTO.firstClass === "TAI_LIEU"
-                ? "Tài liệu"
+              record.criteriaDTO && record.criteriaDTO.firstClass === "QUAN_AO"
+                ? "Quần áo"
                 : "Không xác định"
             }}
           </span>
         </template>
 
         <template v-if="column.key === 'secondClass'">
-          {{ record.accomodationDTO.secondClass }}
+          {{ record.criteriaDTO.secondClass }}
         </template>
 
         <!-- Tiêu đề -->
@@ -282,9 +281,9 @@ export default {
           params.del = selectedDel.value;
         }
 
-        // Lọc theo Loại hình (accomodationDTO.firstClass)
+        // Lọc theo Loại hình (criteriaDTO.firstClass)
 
-        params.firstClass = "TAI_LIEU";
+        params.firstClass = "QUAN_AO";
 
         if (selectedSecondMotel.value) {
           params.secondClass = selectedSecondMotel.value;
