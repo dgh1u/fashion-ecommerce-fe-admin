@@ -17,6 +17,14 @@ export const getDetailProduct = async (id) => {
   });
 };
 
+// Lấy chi tiết sản phẩm theo ID (alias cho UpdateProduct)
+export const getProductById = async (id) => {
+  return axios({
+    url: `api/product/${id}`,
+    method: "GET",
+  });
+};
+
 // Lấy danh sách tin đăng của một người dùng theo userId
 export const getProductsByUserId = async (idUser, params) => {
   return axios({

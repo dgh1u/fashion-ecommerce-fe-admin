@@ -2,38 +2,10 @@
   <div class="flex flex-col h-full">
     <!-- Logo -->
     <div class="flex items-center justify-center h-28 mt-4 mb-6">
-      <svg width="500" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="white" />
-
-        <image
-          href="@/assets/vnua-logo.jpg"
-          x="40"
-          y="70"
-          height="70"
-          width="70"
-        />
-
-        <text
-          x="65%"
-          y="55%"
-          font-family="Impact"
-          font-size="41"
-          fill="black"
-          text-anchor="middle"
-        >
-          VNUA
-        </text>
-        <text
-          x="65%"
-          y="68%"
-          font-family="'Peanut Butter', cursive"
-          font-size="28"
-          fill="black"
-          text-anchor="middle"
-        >
-          Services
-        </text>
-      </svg>
+      <div class="logo-text-footer">
+        <div class="tuan-footer">TUAN</div>
+        <div class="fashion-footer">Fashion</div>
+      </div>
     </div>
 
     <!-- Sidebar Menu -->
@@ -51,44 +23,22 @@
         </router-link>
       </a-menu-item>
 
-      <!-- Dropdown dạng Sidebar cho Bài Đăng -->
-      <a-sub-menu key="product">
-        <template #title>
-          <span class="flex items-center gap-3">
-            <FileText class="w-4 h-4" />
-            <span>Bài đăng</span>
-          </span>
-        </template>
-        <a-menu-item
-          v-for="sub in menuItemsWithChildren[0].children"
-          :key="sub.path"
-        >
-          <router-link :to="sub.path">{{ sub.label }}</router-link>
-        </a-menu-item>
-      </a-sub-menu>
+      
     </a-menu>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import { Wallet, Users, FileText, ChartPie, Activity } from "lucide-vue-next";
+import { Wallet, Users, FileText, ChartPie, Activity, Package, PackagePlus } from "lucide-vue-next";
 
 const menuItems = [
   { label: "Tổng quan", path: "/home/dashboard", icon: ChartPie },
   { label: "Hoạt động", path: "/home/action", icon: Activity },
   { label: "Người dùng", path: "/home/user", icon: Users },
-  {
-    label: "Bài đăng",
-    icon: FileText,
-    children: [
-  
-      
-      { label: "Quần áo", path: "/home/product/document" },
-    ],
-  },
   { label: "Nạp tiền", path: "/home/payment", icon: Wallet },
-  { label: "Đăng sản phẩm", path: "/home/create-product", icon: Users },
+  { label: "Đăng sản phẩm", path: "/home/create-product", icon: PackagePlus},
+  { label: "Quản lý sản phẩm", path: "/home/product", icon: Package },
 ];
 
 // Lọc menuItems thành 2 nhóm
@@ -103,3 +53,25 @@ const menuItemsWithChildren = computed(() =>
 const selectedKeys = ref(["dashboard"]);
 const openKeys = ref(["product"]);
 </script>
+
+<style scoped>
+.logo-text-footer {
+  font-family: "Open Sans", sans-serif;
+  line-height: 1;
+  text-align: center;
+}
+
+.tuan-footer {
+  font-size: 2.5em;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #000000; /* Chữ đen */
+}
+
+.fashion-footer {
+  font-size: 1.6em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #000000; /* Chữ đen */
+}
+</style>

@@ -1,134 +1,220 @@
 <template>
-  <section class="p-8 space-y-6 bg-[#F5F7FF] min-h-screen">
-    <!-- Dòng đầu: Mô tả và bộ chọn -->
-    <div class="flex justify-between items-start mb-4">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">Welcome {{ fullName }}</h1>
-        <p class="text-gray-600 text-sm">
-          Hệ thống đang hoạt động ổn định! Bạn có
-          <span class="text-indigo-600 font-semibold">
-            {{ pendingProductCount }} bài viết chưa duyệt!
-          </span>
-        </p>
-      </div>
+  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <!-- Welcome Section -->
+        <div class="mb-6 lg:mb-0">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <IconUsers class="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                Chào mừng, {{ fullName }}
+              </h1>
+              <p class="text-gray-500 text-sm font-medium">Bảng điều khiển quản trị</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-3">
+            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          
+              <span class="text-orange-600 font-semibold">
+                {{ pendingProductCount }} bài viết chờ duyệt
+              </span>
+          
+          </div>
+        </div>
 
-      <!-- Bộ chọn -->
-      <div class="flex gap-4 flex-wrap items-center">
-        <!-- Chọn năm -->
-        <div>
-          <select
-            v-model="selectedYear"
-            @change="fetchRevenueAndBuildData"
-            class="bg-white rounded-xl p-2 text-sm"
-          >
-            <option v-for="y in availableYears" :key="y" :value="y">
-              {{ y }}
-            </option>
-          </select>
-        </div>
-        <!-- Chế độ -->
-        <div>
-          <select
-            v-model="groupMode"
-            @change="fetchRevenueAndBuildData"
-            class="bg-white rounded-xl p-2 text-sm"
-          >
-            <option value="year">Theo năm</option>
-            <option value="month">Theo tháng</option>
-          </select>
-        </div>
-        <!-- Tháng -->
-        <div v-if="groupMode === 'month'">
-          <select
-            v-model="selectedMonth"
-            @change="fetchRevenueAndBuildData"
-            class="bg-white rounded-xl p-2 text-sm"
-          >
-            <option
-              v-for="m in availableMonths"
-              :key="m.value"
-              :value="m.value"
+        <!-- Control Panel -->
+        <div class="flex flex-wrap gap-3">
+          <div class="relative">
+            <select
+              v-model="selectedYear"
+              @change="fetchRevenueAndBuildData"
+              class="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-8 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
-              {{ m.label }}
-            </option>
-          </select>
+              <option v-for="y in availableYears" :key="y" :value="y">
+                Năm {{ y }}
+              </option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <select
+              v-model="groupMode"
+              @change="fetchRevenueAndBuildData"
+              class="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-8 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="year">Theo năm</option>
+              <option value="month">Theo tháng</option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <div v-if="groupMode === 'month'" class="relative">
+            <select
+              v-model="selectedMonth"
+              @change="fetchRevenueAndBuildData"
+              class="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-8 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option
+                v-for="m in availableMonths"
+                :key="m.value"
+                :value="m.value"
+              >
+                {{ m.label }}
+              </option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Phần giữa: Hình minh họa và 4 box thống kê -->
-    <div class="flex flex-col md:flex-row gap-6">
-      <!-- Desc image (trái) -->
-      <div
-        class="flex-1 bg-white shadow rounded-xl flex items-center justify-center"
-      >
-        <img
-          src="@/assets/admin-dashboard-1.png"
-          alt="Desc"
-          class="object-contain rounded-lg"
-        />
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+      <!-- Users Card -->
+      <div class="group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+            <IconUsers class="w-6 h-6 text-white" />
+          </div>
+          <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+            <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-gray-600 mb-1">Người dùng</h3>
+          <p class="text-2xl font-bold text-gray-900">{{ summary?.totalUsers || 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Tổng số tài khoản</p>
+        </div>
       </div>
 
-      <!-- 4 Box thống kê (phải) -->
-      <div class="flex-1 grid grid-cols-2 gap-10">
-        <!-- Box: Total Users -->
-        <div class="shadow rounded-xl p-4 flex flex-col bg-teal-100">
-          <IconUsers class="w-8 h-8 text-blue-500 mb-2" />
-          <span class="t font-semibold text-gray-600">Người dùng</span>
-          <span class="text-2xl font-bold text-gray-800 mt-4">
-            {{ summary?.totalUsers }}
-          </span>
+      <!-- Payments Card -->
+      <div class="group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+            <IconBanknote class="w-6 h-6 text-white" />
+          </div>
+          <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
         </div>
-        <!-- Box: Total Payments -->
-        <div class="shadow rounded-xl p-4 flex flex-col bg-amber-100">
-          <IconBanknote class="w-8 h-8 text-green-500 mb-2" />
-          <span class="t font-semibold text-gray-600">Giao dịch</span>
-          <span class="text-2xl font-bold text-gray-800 mt-4">
-            {{ summary?.totalPayments }}
-          </span>
+        <div>
+          <h3 class="text-sm font-medium text-gray-600 mb-1">Giao dịch</h3>
+          <p class="text-2xl font-bold text-gray-900">{{ summary?.totalPayments || 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Số lượng thanh toán</p>
         </div>
-        <!-- Box: Total Products -->
-        <div class="bg-cyan-100 shadow rounded-xl p-4 flex flex-col">
-          <IconFileText class="w-8 h-8 text-yellow-500 mb-2" />
-          <span class="t font-semibold text-gray-600">Bài viết</span>
-          <span class="text-2xl font-bold text-gray-800 mt-4">
-            {{ summary?.totalProducts }}
-          </span>
+      </div>
+
+      <!-- Products Card -->
+      <div class="group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-orange-500"></div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+            <Package class="w-6 h-6 text-white" />
+          </div>
+          <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
         </div>
-        <!-- Box: Total Revenue -->
-        <div class="bg-rose-100 shadow rounded-xl p-4 flex flex-col">
-          <IconDollarSign class="w-8 h-8 text-indigo-500 mb-2" />
-          <span class="t font-semibold text-gray-600">Doanh thu</span>
-          <span class="text-2xl font-bold text-gray-800 mt-4">
-            <!-- Sử dụng computed property để format số -->
-            {{ formattedTotalRevenue }}₫
-          </span>
+        <div>
+          <h3 class="text-sm font-medium text-gray-600 mb-1">Sản phẩm</h3>
+          <p class="text-2xl font-bold text-gray-900">{{ summary?.totalProducts || 0 }}</p>
+          <p class="text-xs text-gray-500 mt-1">Tổng số sản phẩm</p>
+        </div>
+      </div>
+
+      <!-- Revenue Card -->
+      <div class="group relative overflow-hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+            <IconDollarSign class="w-6 h-6 text-white" />
+          </div>
+          <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center group-hover:bg-purple-100 transition-colors">
+            <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-gray-600 mb-1">Doanh thu</h3>
+          <p class="text-2xl font-bold text-gray-900">{{ formattedTotalRevenue }}₫</p>
+          <p class="text-xs text-gray-500 mt-1">Tổng thu nhập</p>
         </div>
       </div>
     </div>
 
-    <!-- Phần dưới: 2 biểu đồ, chia làm 2 cột -->
-    <div class="flex flex-col md:flex-row gap-6">
-      <!-- Biểu đồ Doanh Thu (Line/Area Chart) -->
-      <div class="flex-1 bg-white shadow rounded-xl p-6">
-        <span class="text-xl font-bold text-gray-800 mb-4">Doanh Thu</span>
-        <LineChart
-          :chart-data="revenueChartData"
-          :chart-options="revenueChartOptions"
-          class="h-72"
-        />
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <!-- Revenue Chart -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">Biểu đồ Doanh Thu</h3>
+            <p class="text-sm text-gray-500 mt-1">Thống kê doanh thu theo thời gian</p>
+          </div>
+          <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="relative">
+          <LineChart
+            :chart-data="revenueChartData"
+            :chart-options="revenueChartOptions"
+            class="h-80"
+          />
+        </div>
       </div>
-      <!-- Biểu đồ Số Giao Dịch (Bar Chart) -->
-      <div class="flex-1 bg-white shadow rounded-xl p-6">
-        <span class="text-xl font-bold text-gray-800 mb-4">Giao Dịch</span>
-        <BarChart
-          :chart-data="transactionChartData"
-          :chart-options="transactionChartOptions"
-          class="h-72"
-        />
+
+      <!-- Transaction Chart -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">Biểu đồ Giao Dịch</h3>
+            <p class="text-sm text-gray-500 mt-1">Số lượng giao dịch theo thời gian</p>
+          </div>
+          <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="relative">
+          <BarChart
+            :chart-data="transactionChartData"
+            :chart-options="transactionChartOptions"
+            class="h-80"
+          />
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script setup>
@@ -141,6 +227,7 @@ import {
   Banknote as IconBanknote,
   FileText as IconFileText,
   DollarSign as IconDollarSign,
+  Package,
 } from "lucide-vue-next";
 
 // Chart.js + vue-chart-3

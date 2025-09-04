@@ -1,8 +1,18 @@
 <template>
-  <div class="create-product max-w-3xl mx-auto space-y-4">
+  <div class="update-product max-w-3xl mx-auto space-y-4">
     <div class="flex items-center pb-4 justify-center">
-      <span class="font-bold text-3xl text-black">Đăng tải sản phẩm</span>
+      <span class="font-bold text-3xl text-black">Cập nhật sản phẩm</span>
     </div>
+    
+    <!-- Loading state -->
+    <div v-if="dataLoading" class="flex items-center justify-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <span class="ml-3 text-gray-600">Đang tải dữ liệu sản phẩm...</span>
+    </div>
+
+    <!-- Content when loaded -->
+    <template v-else>
+    
     <div class="block bg-white p-4 pb-6 rounded-xl">
       <div class="py-2">
         <span class="font-bold text-base">Phân loại</span>
@@ -21,7 +31,7 @@
           class="w-full"
         >
           <a-select-option value="QUAN_AO">Quần áo</a-select-option>
-          
+  
           <a-select-option value="TUI_XACH">Túi xách</a-select-option>
           <a-select-option value="PHU_KIEN">Phụ kiện</a-select-option>
         </a-select>
@@ -53,14 +63,18 @@
         <label>Giới tính <span class="text-red-500">*</span> </label>
         <div class="flex rounded-lg mt-1">
           <a-select
-            :value="formData.criteria.gender"
-            @change="(value) => (formData.criteria.gender = value)"
+            :value="formData.criteria.gender === true ? 'true' : formData.criteria.gender === false ? 'false' : 'null'"
+            @change="(value) => {
+              if (value === 'true') formData.criteria.gender = true;
+              else if (value === 'false') formData.criteria.gender = false;
+              else formData.criteria.gender = null;
+            }"
             placeholder="Chọn giới tính"
             class="w-full"
           >
-            <a-select-option :value="true">Nam</a-select-option>
-            <a-select-option :value="false">Nữ</a-select-option>
-            <a-select-option :value="null">Không yêu cầu</a-select-option>
+            <a-select-option value="true">Nam</a-select-option>
+            <a-select-option value="false">Nữ</a-select-option>
+            <a-select-option value="null">Không yêu cầu</a-select-option>
           </a-select>
         </div>
       </div>
@@ -134,9 +148,8 @@
       </div>
       
       <!-- Chỉ hiển thị màu sắc và chất liệu cho quần áo -->
-      <div  class="py-2">
+      <div v-if="formData.criteria.firstClass === 'QUAN_AO'" class="py-2">
         <label>Màu sắc <span class="text-red-500">*</span></label>
-
         <div class="flex rounded-lg mt-1">
           <a-select
             :value="formData.criteria.color"
@@ -155,9 +168,8 @@
         </div>
       </div>
       
-      <div  class="py-2">
+      <div v-if="formData.criteria.firstClass === 'QUAN_AO'" class="py-2">
         <label>Chất liệu chính <span class="text-red-500">*</span></label>
-
         <div class="flex rounded-lg mt-1">
           <a-select
             :value="formData.criteria.material"
@@ -177,17 +189,13 @@
       </div>
     </div>
 
-    
-
     <!-- Size và Inventory Form - chỉ hiển thị cho quần áo -->
-    <div
-      
-      class="block bg-white p-4 rounded-xl"
-    >
+    <div v-if="formData.criteria.firstClass === 'QUAN_AO'" class="block bg-white p-4 rounded-xl">
       <SizeInventoryForm
         v-model="inventoryData"
         @validate="handleInventoryValidation"
         ref="sizeInventoryRef"
+        :key="`inventory-${productId}-${Object.keys(inventoryData).length}`"
       />
     </div>
 
@@ -197,7 +205,7 @@
         <span class="font-bold text-base">Hình ảnh</span>
       </div>
 
-      <!-- Single Image Upload Box -->
+      <!-- Multiple Image Upload Box -->
       <div class="mb-4">
         <div
           class="relative border-2 border-dashed border-blue-500 rounded-lg h-48 flex flex-col justify-center items-center cursor-pointer hover:bg-blue-50 transition bg-blue-50"
@@ -263,46 +271,48 @@
       <button
         class="submit-btn bg-sky-500 px-4 py-2 rounded hover:bg-sky-600 w-full flex items-center justify-center"
         :disabled="loading"
-        @click="handleCreateProduct"
+        @click="handleUpdateProduct"
       >
         <div
           v-if="loading"
           class="loader mr-2 animate-spin rounded-full h-5 w-5 border-b-2 border-white"
         ></div>
         <span>
-          <span v-if="!loading">Đăng tin</span>
-          <span v-if="loading">Đang tạo...</span>
+          <span v-if="!loading">Cập nhật bài đăng</span>
+          <span v-if="loading">Đang cập nhật...</span>
         </span>
       </button>
     </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from "vue";
-import { createProduct } from "@/apis/productService.js";
-import { uploadMultipleImages } from "@/apis/imageService.js";
+import { ref, reactive, computed, watch, onMounted, nextTick } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { getProductById, updateProduct } from "@/apis/productService.js";
+import {
+  getImageDTOByProduct,
+  deleteImagesByProduct,
+  uploadMultipleImages,
+} from "@/apis/imageService.js";
+import { updateProductInventory } from "@/apis/sizeService.js";
+import { FolderUp, Trash2 } from "lucide-vue-next";
 
 // Import các component của Ant Design Vue
-import { Select, message, Spin, Modal } from "ant-design-vue";
+import { Select, message, Modal } from "ant-design-vue";
 
 const { confirm } = Modal;
-
 const { Option: ASelectOption } = Select;
-import { Check as CheckIcon, FolderUp, Trash2 } from "lucide-vue-next";
-
-
 import SizeInventoryForm from "@/components/SizeInventoryForm.vue";
 
 // Import các component của Ant Design Vue trực tiếp trong setup
 const ASelect = Select;
 const ASelectOptionComponent = ASelectOption;
-const ASpin = Spin;
 
-const file = ref(null);
-
-// Thêm vào reactive data
-const selectedDocuments = ref([]);
+const route = useRoute();
+const router = useRouter();
+const productId = route.params.id;
 
 // Thêm reactive data cho inventory
 const inventoryData = ref({});
@@ -316,14 +326,12 @@ const formData = reactive({
   criteria: {
     firstClass: "QUAN_AO",
     price: "",
-
     originalPrice: "",
     gender: "",
     color: "",
     material: "",
-    interior: "",
-
     secondClass: "",
+    size: null, // Thêm field size
   },
 });
 
@@ -344,68 +352,13 @@ const materialList = ref([
   { id: 6, name: "Satin" },
 ]);
 
-const featureOptionsMotel = ref([
-  { label: "Đầy đủ nội thất", value: "interior" },
-  { label: "Có điều hòa", value: "airConditioner" },
-  { label: "Có nóng lạnh", value: "heater" },
-  { label: "Có internet", value: "internet" },
-  { label: "Vệ sinh khép kín", value: "toilet" },
-  { label: "Giờ giấc tự do", value: "time" },
-  { label: "Có chỗ để xe", value: "parking" },
-  { label: "An ninh tốt", value: "security" },
-  { label: "Không chung chủ", value: "owner" },
-  { label: "Kệ bếp", value: "kitchen" },
-]);
-
-const featureOptionsStore = ref([
-  { label: "Có giao hàng", value: "delivery" },
-  { label: "Phục vụ tại chỗ", value: "dineIn" },
-  { label: "Mua mang đi", value: "takeAway" },
-  { label: "Không gian rộng", value: "bigSpace" },
-  { label: "Có chỗ để xe", value: "parking" },
-  { label: "Có điều hòa", value: "airConditioner" },
-  { label: "Wifi miễn phí", value: "internet" },
-]);
-
-const mapAddress = ref("");
-const addressTimer = ref(null);
 const loading = ref(false);
+const dataLoading = ref(true); // Thêm loading state riêng cho việc load dữ liệu
 
-// Computed properties
-const displayMapAddress = computed(() => {
-  return mapAddress.value.trim() || "VNUA";
-});
-
-// Watchers
-watch(
-  () => formData.criteria.address,
-  (newAddress) => {
-    if (addressTimer.value) clearTimeout(addressTimer.value);
-    addressTimer.value = setTimeout(() => {
-      mapAddress.value = newAddress;
-    }, 1000);
-  }
-);
-
-// Computed property to check if all 4 images are required based on property type
-const isImagesRequired = computed(() => {
-  return (
-    formData.criteria.firstClass === "PHONG_TRO" ||
-    formData.criteria.firstClass === "O_GHEP" ||
-    formData.criteria.firstClass === "QUAN_AN" ||
-    formData.criteria.firstClass === "QUAN_NUOC" ||
-    formData.criteria.firstClass === "CUA_HANG" ||
-    formData.criteria.firstClass === "TIEN_ICH"
-  );
-});
-
-// Thay đổi từ files array thành uploadedImages
+// Replace single imageBox with multiple uploadedImages
 const uploadedImages = ref([]);
 
-// Thay thế files ref
-// const files = ref([null, null, null, null]);
-
-// Thay đổi handle file change
+// Handle multiple file upload
 const handleMultipleFileChange = (e) => {
   const selectedFiles = Array.from(e.target.files);
 
@@ -432,10 +385,270 @@ const handleMultipleFileChange = (e) => {
     uploadedImages.value.push({
       file: file,
       preview: URL.createObjectURL(file),
+      isExisting: false,
     });
   });
 
   e.target.value = null;
+};
+
+/**
+ * Xóa ảnh ở một index cụ thể
+ */
+const removeUploadedImage = (index) => {
+  if (uploadedImages.value[index]) {
+    if (uploadedImages.value[index].preview && !uploadedImages.value[index].isExisting) {
+      URL.revokeObjectURL(uploadedImages.value[index].preview);
+    }
+    uploadedImages.value.splice(index, 1);
+  }
+};
+
+// Helper function to convert base64 to file
+function base64ToFile(base64, fileName, fileType) {
+  const byteCharacters = atob(base64);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  return new File([byteArray], fileName, { type: fileType });
+}
+
+/**
+ * onMounted: Lấy chi tiết sản phẩm và load dữ liệu hiện có
+ */
+onMounted(async () => {
+  dataLoading.value = true;
+  
+  try {
+    // 1) Lấy detail product
+    const resp = await getProductById(productId);
+    const data = resp.data;
+
+    formData.title = data.title;
+    formData.content = data.content;
+
+    if (data.criteriaDTO) {
+      Object.assign(formData.criteria, data.criteriaDTO);
+    }
+
+    // 2) Load ảnh cũ (nhiều ảnh)
+    const imgRes = await getImageDTOByProduct(productId);
+    console.log("Response từ getImageDTOByProduct:", imgRes);
+
+    if (imgRes && Array.isArray(imgRes) && imgRes.length > 0) {
+      // Load tất cả ảnh, không chỉ ảnh đầu tiên
+      uploadedImages.value = imgRes.map((img) => {
+        const previewUrl = `data:${img.fileType};base64,${img.uri}`;
+        return {
+          id: img.id,
+          fileName: img.fileName,
+          fileType: img.fileType,
+          base64: img.uri,
+          preview: previewUrl,
+          isExisting: true,
+        };
+      });
+    }
+
+    // 3) Load inventory data từ inventories trong product data
+    if (data.inventories) {
+      // Load sizes để có mapping
+      try {
+        const { getAllSizes } = await import("@/apis/sizeService.js");
+        const sizesResponse = await getAllSizes();
+        
+        if (sizesResponse.success) {
+          const inventory = {};
+          
+          // Map inventory data by size ID từ data.inventories
+          data.inventories.forEach((item) => {
+            const sizeId = item.size?.id;
+            const quantity = item.quantity;
+            
+            if (sizeId && quantity !== undefined) {
+              inventory[sizeId] = quantity;
+            }
+          });
+          
+          inventoryData.value = inventory;
+          
+          // Trigger validation sau khi load data
+          setTimeout(() => {
+            if (sizeInventoryRef.value) {
+              isInventoryValid.value = Object.values(inventory).some(qty => Number(qty) > 0);
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error("❌ Error loading sizes:", error);
+      }
+    }
+
+  } catch (error) {
+    console.error("❌ CRITICAL ERROR loading product data:", error);
+    message.error("Không thể tải dữ liệu sản phẩm.");
+  } finally {
+    dataLoading.value = false;
+  }
+});
+
+const buildPayload = () => {
+  // Thêm một size representative để tránh lỗi null pointer trong backend
+  const payload = {
+    ...formData,
+    inventory: inventoryData.value,
+  };
+  
+  // Đảm bảo criteria có size để tránh lỗi null pointer
+  if (formData.criteria.firstClass === 'QUAN_AO') {
+    // Lấy size ID đầu tiên từ inventory hoặc dùng size mặc định
+    const firstSizeId = Object.keys(inventoryData.value)[0] || 1;
+    payload.criteria.size = {
+      id: parseInt(firstSizeId),
+      name: "Representative Size" // Size đại diện, vì inventory được quản lý riêng cho từng size
+    };
+  }
+  
+  return payload;
+};
+
+/**
+ * Thực hiện cập nhật bài đăng
+ */
+async function executeUpdateProduct() {
+  loading.value = true;
+  try {
+    console.log("Cập nhật bài đăng với payload:", buildPayload());
+    console.log("Inventory data:", inventoryData.value);
+    
+    // 1. Cập nhật thông tin sản phẩm bao gồm inventory
+    await updateProduct(productId, buildPayload());
+    console.log("Cập nhật bài đăng và inventory thành công.");
+
+    // 2. Xoá toàn bộ ảnh cũ trên server
+    await deleteImagesByProduct(productId);
+
+    // 3. Upload multiple images
+    const filesToUpload = uploadedImages.value.map((img) => {
+      return img.isExisting
+        ? base64ToFile(img.base64, img.fileName, img.fileType)
+        : img.file;
+    });
+
+    if (filesToUpload.length > 0) {
+      await uploadMultipleImages(productId, filesToUpload);
+    }
+
+    message.success("Cập nhật bài đăng thành công!");
+    router.push(`/product/${productId}`);
+  } catch (error) {
+    console.error("❌ Lỗi khi cập nhật bài đăng:", error);
+    message.error("Đã có lỗi xảy ra khi cập nhật bài đăng");
+  } finally {
+    loading.value = false;
+  }
+}
+
+const handleUpdateProduct = () => {
+  // Validate số lượng ảnh (ít nhất 2 ảnh)
+  if (uploadedImages.value.length < 2) {
+    message.error("Bạn phải tải lên ít nhất 2 ảnh");
+    return;
+  }
+  if (uploadedImages.value.length > 8) {
+    message.error("Bạn chỉ được tải lên tối đa 8 ảnh");
+    return;
+  }
+
+  // Validate inventory
+  if (!isInventoryValid.value) {
+    message.error("Vui lòng nhập số lượng tồn kho cho ít nhất 1 size");
+    return;
+  }
+
+  // Validate tiêu đề:
+  if (!formData.title.trim()) {
+    message.error("Tiêu đề không được để trống");
+    return;
+  }
+  if (
+    formData.title.trim().length < 10 ||
+    formData.title.trim().length > 50
+  ) {
+    message.error("Tiêu đề phải từ 10 đến 50 ký tự");
+    return;
+  }
+
+  // Validate nội dung mô tả:
+  if (!formData.content.trim()) {
+    message.error("Nội dung mô tả không được để trống");
+    return;
+  }
+  if (
+    formData.content.trim().length < 50 ||
+    formData.content.trim().length > 500
+  ) {
+    message.error("Nội dung mô tả phải từ 50 đến 500 ký tự");
+    return;
+  }
+
+  // Validate các trường bắt buộc chung
+  if (!formData.criteria.price) {
+    message.error("Giá sản phẩm không được để trống");
+    return;
+  }
+  if (!formData.criteria.originalPrice) {
+    message.error("Giá gốc không được để trống");
+    return;
+  }
+  if (!formData.criteria.secondClass) {
+    message.error(`${getSecondClassLabel()} không được để trống`);
+    return;
+  }
+  
+  // Validate các trường bắt buộc cho quần áo
+  if (formData.criteria.firstClass === 'QUAN_AO') {
+    if (
+      formData.criteria.gender === "" ||
+      formData.criteria.gender === undefined
+    ) {
+      message.error("Giới tính không được để trống");
+      return;
+    }
+    if (!formData.criteria.color) {
+      message.error("Màu sắc không được để trống");
+      return;
+    }
+    if (!formData.criteria.material) {
+      message.error("Chất liệu không được để trống");
+      return;
+    }
+    
+    // Validate inventory cho quần áo
+    if (!isInventoryValid.value) {
+      message.error("Vui lòng nhập số lượng tồn kho cho ít nhất một size");
+      return;
+    }
+  }
+
+  // Hiển thị confirm trước khi cập nhật
+  confirm({
+    title: "Xác nhận cập nhật bài đăng",
+    content: "Bạn có chắc chắn muốn cập nhật bài đăng này không?",
+    async onOk() {
+      await executeUpdateProduct();
+    },
+    onCancel() {
+      message.info("Đã hủy cập nhật");
+    },
+  });
+};
+
+// Xử lý inventory validation
+const handleInventoryValidation = (isValid) => {
+  isInventoryValid.value = isValid;
 };
 
 // Methods for handling firstClass and secondClass
@@ -443,7 +656,7 @@ const getSecondClassLabel = () => {
   switch (formData.criteria.firstClass) {
     case 'QUAN_AO':
       return 'Loại quần áo';
-    
+
     case 'TUI_XACH':
       return 'Loại túi xách';
     case 'PHU_KIEN':
@@ -457,7 +670,7 @@ const getSecondClassPlaceholder = () => {
   switch (formData.criteria.firstClass) {
     case 'QUAN_AO':
       return 'Chọn loại quần áo';
- 
+
     case 'TUI_XACH':
       return 'Chọn loại túi xách';
     case 'PHU_KIEN':
@@ -481,7 +694,7 @@ const getSecondClassOptions = () => {
         'Đồ lót',
         'Đồ mặc nhà'
       ];
- 
+   
     case 'TUI_XACH':
       return [
         'Ví',
@@ -501,296 +714,17 @@ const getSecondClassOptions = () => {
   }
 };
 
-const removeUploadedImage = (index) => {
-  if (uploadedImages.value[index]) {
-    URL.revokeObjectURL(uploadedImages.value[index].preview);
-    uploadedImages.value.splice(index, 1);
+// Watch inventory data changes to force update component
+watch(() => inventoryData.value, (newData, oldData) => {
+  if (sizeInventoryRef.value && Object.keys(newData).length > 0) {
+    // Force component to re-validate
+    nextTick(() => {
+      const hasValidQuantity = Object.values(newData).some(qty => Number(qty) > 0);
+      isInventoryValid.value = hasValidQuantity;
+    });
   }
-};
-
-const handleTimeChange = (time) => {
-  if (time && Array.isArray(time) && time.length === 2) {
-    const formatTime = (timeValue) => {
-      if (!timeValue) return "";
-      const date = new Date(timeValue);
-      const hours = date.getHours().toString().padStart(2, "0");
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      return `${hours}:${minutes}`;
-    };
-
-    const startTime = formatTime(time[0]);
-    const endTime = formatTime(time[1]);
-
-    // Lưu trực tiếp dưới dạng chuỗi
-    formData.criteria.openHours = `${startTime} - ${endTime}`;
-  }
-};
-
-const handleCreateProduct = () => {
-  // Validate số lượng ảnh (2-8 ảnh)
-  if (uploadedImages.value.length < 2) {
-    message.error("Bạn phải tải lên ít nhất 2 ảnh");
-    return;
-  }
-  if (uploadedImages.value.length > 8) {
-    message.error("Bạn chỉ được tải lên tối đa 8 ảnh");
-    return;
-  }
-
-  // Validate cho QUAN_AO
-  if (formData.criteria.firstClass === "QUAN_AO") {
-    // Validate inventory
-    if (!isInventoryValid.value) {
-      message.error("Vui lòng nhập số lượng tồn kho cho ít nhất 1 size");
-      return;
-    }
-
-    // Validate tiêu đề:
-    if (!formData.title.trim()) {
-      message.error("Tiêu đề không được để trống");
-      return;
-    }
-    if (
-      formData.title.trim().length < 10 ||
-      formData.title.trim().length > 50
-    ) {
-      message.error("Tiêu đề phải từ 10 đến 50 ký tự");
-      return;
-    }
-
-    // Validate nội dung mô tả:
-    if (!formData.content.trim()) {
-      message.error("Nội dung mô tả không được để trống");
-      return;
-    }
-    if (
-      formData.content.trim().length < 50 ||
-      formData.content.trim().length > 500
-    ) {
-      message.error("Nội dung mô tả phải từ 50 đến 500 ký tự");
-      return;
-    }
-
-    // Validate các trường bắt buộc cho quần áo
-    if (!formData.criteria.price) {
-      message.error("Giá sản phẩm không được để trống");
-      return;
-    }
-    if (!formData.criteria.originalPrice) {
-      message.error("Giá gốc không được để trống");
-      return;
-    }
-    if (!formData.criteria.secondClass) {
-      message.error("Loại quần áo không được để trống");
-      return;
-    }
-    if (
-      formData.criteria.gender === "" ||
-      formData.criteria.gender === undefined
-    ) {
-      message.error("Giới tính không được để trống");
-      return;
-    }
-    if (!formData.criteria.color) {
-      message.error("Màu sắc không được để trống");
-      return;
-    }
-    if (!formData.criteria.material) {
-      message.error("Chất liệu không được để trống");
-      return;
-    }
-  }
-  
-  // Validate cho các loại sản phẩm khác (TUI_XACH, PHU_KIEN)
-  if ([ "TUI_XACH", "PHU_KIEN"].includes(formData.criteria.firstClass)) {
-    // Validate tiêu đề:
-    if (!formData.title.trim()) {
-      message.error("Tiêu đề không được để trống");
-      return;
-    }
-    if (
-      formData.title.trim().length < 10 ||
-      formData.title.trim().length > 50
-    ) {
-      message.error("Tiêu đề phải từ 10 đến 50 ký tự");
-      return;
-    }
-
-    // Validate nội dung mô tả:
-    if (!formData.content.trim()) {
-      message.error("Nội dung mô tả không được để trống");
-      return;
-    }
-    if (
-      formData.content.trim().length < 50 ||
-      formData.content.trim().length > 500
-    ) {
-      message.error("Nội dung mô tả phải từ 50 đến 500 ký tự");
-      return;
-    }
-
-    // Validate các trường bắt buộc chung
-    if (!formData.criteria.price) {
-      message.error("Giá sản phẩm không được để trống");
-      return;
-    }
-    if (!formData.criteria.originalPrice) {
-      message.error("Giá gốc không được để trống");
-      return;
-    }
-    if (!formData.criteria.secondClass) {
-      message.error(`${getSecondClassLabel()} không được để trống`);
-      return;
-    }
-  }
-
-  if (
-    formData.criteria.firstClass === "QUAN_AN" ||
-    formData.criteria.firstClass === "QUAN_NUOC" ||
-    formData.criteria.firstClass === "CUA_HANG" ||
-    formData.criteria.firstClass === "TIEN_ICH"
-  ) {
-    // Validate tiêu đề:
-    if (!formData.title.trim()) {
-      message.error("Tiêu đề không được để trống");
-      return;
-    }
-    if (
-      formData.title.trim().length < 10 ||
-      formData.title.trim().length > 50
-    ) {
-      message.error("Tiêu đề phải từ 10 đến 100 ký tự");
-      return;
-    }
-
-    // Validate nội dung mô tả:
-    if (!formData.content.trim()) {
-      message.error("Nội dung mô tả không được để trống");
-      return;
-    }
-    if (
-      formData.content.trim().length < 50 ||
-      formData.content.trim().length > 500
-    ) {
-      message.error("Nội dung mô tả phải từ 50 đến 500 ký tự");
-      return;
-    }
-    if (!formData.criteria.openHours) {
-      message.error("Giờ mở cửa không được để trống");
-      return;
-    }
-
-    if (!formData.criteria.idDistrict) {
-      message.error("Khu vực không được để trống");
-      return;
-    }
-    if (!formData.criteria.address.trim()) {
-      message.error("Địa chỉ không được để trống");
-      return;
-    }
-    if (isImagesRequired.value) {
-      if (
-        !files.value[0] ||
-        !files.value[1] ||
-        !files.value[2] ||
-        !files.value[3]
-      ) {
-        message.error("Bạn phải tải lên đủ 4 ảnh theo yêu cầu");
-        return;
-      }
-    }
-  }
-
-  // Hiển thị confirm trước khi đăng
-  confirm({
-    title: "Xác nhận đăng bài",
-    content: "Bạn có chắc chắn muốn đăng bài viết này không? (Phí: 2000₫/lần)",
-    async onOk() {
-      loading.value = true;
-      try {
-        // Thêm inventory data vào formData trước khi gửi
-        const productData = {
-          ...formData,
-          inventory: inventoryData.value,
-        };
-
-        const { data: product } = await createProduct(productData);
-        const productId = product.id;
-
-        // Upload multiple images if exist
-        const imagesToUpload = uploadedImages.value.map((img) => img.file);
-
-        if (imagesToUpload.length > 0) {
-          await uploadMultipleImages(productId, imagesToUpload);
-        }
-
-        // Upload documents if any
-        if (selectedDocuments.value.length > 0) {
-          for (const doc of selectedDocuments.value) {
-            await uploadDocument(productId, doc);
-          }
-        }
-
-        message.success("Đăng tin thành công!");
-        resetForm();
-        // Reset uploadedImages array
-        uploadedImages.value.forEach((img) => {
-          URL.revokeObjectURL(img.preview);
-        });
-        uploadedImages.value = [];
-      } catch (error) {
-        const errorMessage = error.message;
-        if (errorMessage.includes("Số dư không đủ")) {
-          message.error(
-            "Không thể đăng bài: Số dư không đủ 2000 đồng. Vui lòng nạp thêm tiền để có thể Đăng tin!"
-          );
-        } else {
-          message.error("Đã có lỗi xảy ra");
-        }
-      } finally {
-        loading.value = false;
-      }
-    },
-    onCancel() {
-      message.info("Đã hủy đăng tin");
-    },
-  });
-};
-
-const toggleFeature = (featureValue) => {
-  formData.criteria[featureValue] = !formData.criteria[featureValue];
-};
-
-// Xử lý inventory validation
-const handleInventoryValidation = (isValid) => {
-  isInventoryValid.value = isValid;
-};
-
-const resetForm = () => {
-  Object.assign(formData, {
-    title: "",
-    content: "",
-    criteria: {
-      firstClass: "QUAN_AO",
-      price: "",
-      originalPrice: "",
-      gender: "",
-      color: "",
-      material: "",
-      secondClass: "",
-    },
-  });
-  // Reset uploadedImages khi reset form
-  uploadedImages.value.forEach((img) => {
-    URL.revokeObjectURL(img.preview);
-  });
-  uploadedImages.value = [];
-
-  // Reset inventory data
-  inventoryData.value = {};
-};
+}, { deep: true, immediate: true });
 </script>
-
 <style scoped>
 .submit-btn:hover {
   background-color: #2980b9;

@@ -1,8 +1,8 @@
 <template>
   <div class="p-4 pt-12">
-    <DocumentDetail
+    <ProductDetail
       v-if="selectedProductId"
-      v-model:open="showDocumentDetailPopup"
+      v-model:open="showProductDetailPopup"
       :productId="selectedProductId"
     />
 
@@ -22,31 +22,17 @@
           </template>
         </a-input>
 
-        <!-- Bộ lọc Phân loại Tài liệu -->
+        <!-- Bộ lọc Phân loại (firstClass) -->
         <a-select
-          v-if="selectedDocumentType === 'QUAN_AO'"
-          v-model:value="selectedSecondMotel"
+          v-model:value="selectedFirstClass"
           placeholder="Phân loại"
           style="width: 150px"
           @change="handleFilterChange"
         >
-          <a-select-option value="Giáo trình">Giáo trình</a-select-option>
-          <a-select-option value="Sách tham khảo"
-            >Sách tham khảo</a-select-option
-          >
-          <a-select-option value="Khóa luận tốt nghiệp"
-            >Khóa luận tốt nghiệp</a-select-option
-          >
-          <a-select-option value="Báo cáo thực tập"
-            >Báo cáo thực tập</a-select-option
-          >
-          <a-select-option value="Nghiên cứu khoa học"
-            >Nghiên cứu khoa học</a-select-option
-          >
-          <a-select-option value="Bài báo khoa học"
-            >Bài báo khoa học</a-select-option
-          >
-          <a-select-option value="Tài liệu khác">Tài liệu khác</a-select-option>
+          <a-select-option :value="null">Tất cả</a-select-option>
+          <a-select-option value="QUAN_AO">Quần áo</a-select-option>
+          <a-select-option value="TUI_XACH">Túi xách</a-select-option>
+          <a-select-option value="PHU_KIEN">Phụ kiện</a-select-option>
         </a-select>
 
         <!-- Bộ lọc trạng thái -->
@@ -107,9 +93,12 @@
           <span
             :style="{
               color:
-                record.criteriaDTO &&
-                record.criteriaDTO.firstClass === 'QUAN_AO'
+                record.criteriaDTO && record.criteriaDTO.firstClass === 'QUAN_AO'
                   ? 'green'
+                  : record.criteriaDTO && record.criteriaDTO.firstClass === 'TUI_XACH'
+                  ? 'blue'
+                  : record.criteriaDTO && record.criteriaDTO.firstClass === 'PHU_KIEN'
+                  ? 'orange'
                   : 'black',
               fontWeight: 'bold',
             }"
@@ -117,6 +106,10 @@
             {{
               record.criteriaDTO && record.criteriaDTO.firstClass === "QUAN_AO"
                 ? "Quần áo"
+                : record.criteriaDTO && record.criteriaDTO.firstClass === "TUI_XACH"
+                ? "Túi xách"
+                : record.criteriaDTO && record.criteriaDTO.firstClass === "PHU_KIEN"
+                ? "Phụ kiện"
                 : "Không xác định"
             }}
           </span>
@@ -180,6 +173,10 @@
             <template #icon><EyeOutlined /></template>
           </a-button>
 
+          <a-button type="link" @click="editProduct(record)">
+            <template #icon><EditOutlined /></template>
+          </a-button>
+
           <a-button type="link" danger @click="confirmDelete(record)">
             <template #icon><DeleteOutlined /></template>
           </a-button>
@@ -191,6 +188,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { getListProduct, deleteProduct } from "@/apis/productService";
 import { message, Modal } from "ant-design-vue";
 import {
@@ -198,19 +196,22 @@ import {
   DeleteOutlined,
   SearchOutlined,
   EyeOutlined,
+  EditOutlined,
 } from "@ant-design/icons-vue";
-import DocumentDetail from "./DocumentDetail.vue";
+import ProductDetail from "./ProductDetail.vue";
 
 export default {
   components: {
     PlusOutlined,
     EyeOutlined,
+    EditOutlined,
     DeleteOutlined,
     SearchOutlined,
 
-    DocumentDetail,
+    ProductDetail,
   },
   setup() {
+    const router = useRouter();
     const products = ref([]);
     const loading = ref(false);
     const searchText = ref("");
@@ -221,11 +222,11 @@ export default {
       total: 0,
       showTotal: (total, range) => `Tổng cộng: ${total} bản ghi`,
     });
-    const showDocumentDetailPopup = ref(false);
+    const showProductDetailPopup = ref(false);
     const selectedProductId = ref(null);
     const selectedUserId = ref(null);
     const selectedDel = ref(null); // Định nghĩa lọc Hiển thị
-    const selectedDocumentType = ref(null); // Định nghĩa lọc Loại hình
+    const selectedFirstClass = ref(null); // Định nghĩa lọc firstClass
     const selectedSecondMotel = ref(null);
 
     // Cấu hình các cột cho bảng
@@ -282,8 +283,9 @@ export default {
         }
 
         // Lọc theo Loại hình (criteriaDTO.firstClass)
-
-        params.firstClass = "QUAN_AO";
+        if (selectedFirstClass.value) {
+          params.firstClass = selectedFirstClass.value;
+        }
 
         if (selectedSecondMotel.value) {
           params.secondClass = selectedSecondMotel.value;
@@ -327,7 +329,11 @@ export default {
 
     const viewProduct = (record) => {
       selectedProductId.value = record.id;
-      showDocumentDetailPopup.value = true;
+      showProductDetailPopup.value = true;
+    };
+
+    const editProduct = (record) => {
+      router.push(`/home/update-product/${record.id}`);
     };
 
     // Xác nhận và xóa bài viết
@@ -364,12 +370,13 @@ export default {
       handleFilterChange,
       confirmDelete,
       viewProduct,
+      editProduct,
 
-      showDocumentDetailPopup,
+      showProductDetailPopup,
       selectedProductId,
 
       selectedUserId,
-      selectedDocumentType,
+      selectedFirstClass,
       selectedDel,
       selectedSecondMotel,
     };

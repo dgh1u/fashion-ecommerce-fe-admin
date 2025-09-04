@@ -77,7 +77,7 @@ const pageTitles = {
   "/home/action": { title: "HOẠT ĐỘNG", icon: Activity },
   "/home/user": { title: "NGƯỜI DÙNG", icon: Users },
   "/home/payment": { title: "NẠP TIỀN", icon: Wallet },
-  "/home/product/motel": { title: "TIN ĐĂNG NHÀ TRỌ", icon: House },
+  "/home/product/class": { title: "TIN ĐĂNG NHÀ TRỌ", icon: House },
   "/home/product/food-beverage": {
     title: "TIN ĐĂNG ĂN UỐNG",
     icon: Utensils,
@@ -85,10 +85,6 @@ const pageTitles = {
   "/home/product/store-utility": {
     title: "TIN ĐĂNG CỬA HÀNG - TIỆN ÍCH",
     icon: Store,
-  },
-  "/home/product/document": {
-    title: "TIN ĐĂNG TÀI LIỆU",
-    icon: FileText,
   },
 };
 

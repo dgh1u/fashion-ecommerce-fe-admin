@@ -8,7 +8,9 @@ import Action from "../pages/action/Action.vue";
 
 import PaymentManagement from "../pages/payment/PaymentManagement.vue";
 import CreateProduct from "../pages/create-product/CreateProduct.vue";
-import DocumentManagement from "../pages/product/document/DocumentManagement.vue";
+import UpdateProduct from "../pages/update-product/UpdateProduct.vue";
+import ProductManagement from "../pages/product/ProductManagement.vue";
+import ProductDetail from "../pages/product/ProductDetail.vue";
 
 
 export default [
@@ -52,9 +54,23 @@ export default [
         meta: { requiresAuth: false },
       },
       {
-        path: "product/document",
-        name: "DocumentPost",
-        component: DocumentManagement,
+        path: "product",
+        name: "ProductManagement",
+        component: ProductManagement,
+        meta: { requiresAuth: false },
+      },
+      {
+        path: "product/:id",
+        name: "ProductDetail",
+        component: ProductDetail,
+        meta: { requiresAuth: false },
+      },
+
+
+      {
+        path: "update-product/:id",
+        name: "UpdateProduct",
+        component: UpdateProduct,
         meta: { requiresAuth: false },
       },
     ],

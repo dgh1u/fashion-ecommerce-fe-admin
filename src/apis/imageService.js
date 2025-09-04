@@ -59,3 +59,13 @@ export const downloadImage = async (fileId) => {
     responseType: "blob",
   });
 };
+
+// Alias methods for product-specific operations (for UpdateProduct.vue)
+export const getImagesByProductId = async (idProduct) => {
+  const response = await getImageDTOByProduct(idProduct);
+  return response.data; // Return just the data array
+};
+
+export const deleteImagesByProductId = async (idProduct) => {
+  return deleteImagesByProduct(idProduct);
+};

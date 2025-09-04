@@ -8,7 +8,7 @@
     <div class="create-product space-y-4">
       <!-- Tiêu đề tin đăng -->
       <div class="block flex items-center justify-center">
-        <span class="font-bold text-3xl text-teal-500">Chi tiết tin đăng</span>
+        <span class="font-bold text-3xl text-stone-500">Chi tiết sản phẩm</span>
       </div>
 
       <!-- Thông tin Hình thức -->
@@ -18,7 +18,7 @@
         </div>
         <label> Loại hình <span class="text-red-500">*</span> </label>
         <div class="flex rounded-lg mt-1 p-2">
-          <span class="font-bold" :class="motelColor">{{ displayMotel }}</span>
+          <span class="font-bold" :class="classColor">{{ displayClass }}</span>
         </div>
 
         <!-- Phân loại -->
@@ -26,7 +26,19 @@
           <label>Phân loại</label>
           <div class="flex rounded-lg mt-1 p-2">
             <span class="font-bold">{{
-              formData.accomodation.secondMotel
+              formData.criteria.secondClass
+            }}</span>
+          </div>
+        </div>
+
+        <!-- Giới tính -->
+        <div class="py-2">
+          <label>Giới tính</label>
+          <div class="flex rounded-lg mt-1 p-2">
+            <span class="font-bold">{{
+              formData.criteria.gender === true ? 'Nam' : 
+              formData.criteria.gender === false ? 'Nữ' : 
+              'Không xác định'
             }}</span>
           </div>
         </div>
@@ -135,15 +147,58 @@
           </div>
         </div>
 
+       
+
+        <!-- Màu sắc -->
         <div class="py-2">
-          <label class="block text-gray-700">Chuyên ngành</label>
-          <div
-            class="flex items-center border border-gray-300 rounded-lg mt-1 w-50"
-          >
+          <label class="block text-gray-700">Màu sắc</label>
+          <div class="flex border border-gray-300 rounded-lg mt-1">
             <input
-              v-model.number="formData.accomodation.major"
+              v-model="formData.criteria.color"
               type="text"
-              placeholder="VD: 3500"
+              placeholder="Màu sắc sản phẩm"
+              class="w-full p-2 border-none outline-none rounded-lg bg-gray-50"
+              disabled
+            />
+          </div>
+        </div>
+
+        <!-- Chất liệu -->
+        <div class="py-2">
+          <label class="block text-gray-700">Chất liệu</label>
+          <div class="flex border border-gray-300 rounded-lg mt-1">
+            <input
+              v-model="formData.criteria.material"
+              type="text"
+              placeholder="Chất liệu sản phẩm"
+              class="w-full p-2 border-none outline-none rounded-lg bg-gray-50"
+              disabled
+            />
+          </div>
+        </div>
+
+        <!-- Giá bán -->
+        <div class="py-2">
+          <label class="block text-gray-700">Giá bán</label>
+          <div class="flex border border-gray-300 rounded-lg mt-1">
+            <input
+              v-model="formData.criteria.price"
+              type="text"
+              placeholder="Giá bán"
+              class="w-full p-2 border-none outline-none rounded-lg bg-gray-50"
+              disabled
+            />
+          </div>
+        </div>
+
+        <!-- Giá gốc -->
+        <div class="py-2">
+          <label class="block text-gray-700">Giá gốc</label>
+          <div class="flex border border-gray-300 rounded-lg mt-1">
+            <input
+              v-model="formData.criteria.originalPrice"
+              type="text"
+              placeholder="Giá gốc"
               class="w-full p-2 border-none outline-none rounded-lg bg-gray-50"
               disabled
             />
@@ -151,177 +206,52 @@
         </div>
       </div>
 
-      <!-- PHẦN TÀI LIỆU -->
-      <div v-if="documents && documents.length > 0">
-        <div class="block bg-white rounded-xl p-4">
-          <div class="py-2">
-            <span class="font-bold text-base">Tài liệu đính kèm</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div
-              v-for="doc in documents"
-              :key="doc.id"
-              class="flex items-center p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all cursor-pointer group"
-              @click="handleDocumentClick(doc)"
-            >
-              <!-- File Icon -->
-              <!-- File Icon -->
-              <div
-                class="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mr-3"
-              >
-                <!-- PDF Icon -->
-                <img
-                  v-if="doc.fileType && doc.fileType.includes('pdf')"
-                  src="@/assets/fileLogo/pdf.svg"
-                  alt="PDF"
-                  class="w-6 h-6"
-                />
-                <!-- Word Icon -->
-                <img
-                  v-else-if="
-                    doc.fileType &&
-                    (doc.fileType.includes('word') ||
-                      doc.fileName.includes('.docx') ||
-                      doc.fileName.includes('.doc'))
-                  "
-                  src="@/assets/fileLogo/word.svg"
-                  alt="Word Document"
-                  class="w-6 h-6"
-                />
-                <!-- PowerPoint Icon -->
-                <img
-                  v-else-if="
-                    doc.fileType &&
-                    (doc.fileType.includes('presentation') ||
-                      doc.fileName.includes('.ppt') ||
-                      doc.fileName.includes('.pptx'))
-                  "
-                  src="@/assets/fileLogo/pp.svg"
-                  alt="PowerPoint Presentation"
-                  class="w-6 h-6"
-                />
-                <!-- Excel Icon -->
-                <img
-                  v-else-if="
-                    doc.fileType &&
-                    (doc.fileType.includes('excel') ||
-                      doc.fileType.includes('spreadsheet') ||
-                      doc.fileName.includes('.xlsx') ||
-                      doc.fileName.includes('.xls'))
-                  "
-                  src="@/assets/fileLogo/excel.svg"
-                  alt="Excel Spreadsheet"
-                  class="w-6 h-6"
-                />
-
-                <!-- Zip Icon -->
-                <img
-                  v-else-if="
-                    doc.fileType && doc.fileType.includes('x-zip-compressed')
-                  "
-                  src="@/assets/fileLogo/zip.png"
-                  alt="Zip"
-                  class="w-6 h-6"
-                />
-
-                <!-- Default File Icon -->
-                <svg
-                  v-else
-                  class="w-6 h-6 text-gray-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M4 18h12V6l-4-4H4v16zm8-14v4h4l-4-4z" />
-                </svg>
-              </div>
-
-              <!-- File Info -->
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-900 truncate mb-1">
-                  {{ doc.fileName }}
-                </p>
-                <span
-                  class="text-xs text-gray-500 mb-1 flex justify-between items-center"
-                >
-                  <span>{{
-                    getFileTypeText(doc.fileType || doc.fileName)
-                  }}</span>
-                  <!-- Download hint hiện sát phải khi hover -->
-                  <span
-                    class="text-green-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium"
-                  >
-                    Click để tải về
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
+      <!-- PHẦN THÔNG TIN SIZE VÀ TỒN KHO -->
+      <div class="block bg-white rounded-xl p-4">
+        <div class="py-2">
+          <span class="font-bold text-base">Số lượng size tồn kho</span>
         </div>
-      </div>
 
-      <!-- PHẦN LINK THAM KHẢO -->
-      <div v-if="formData.accomodation.referenceUrl" class="pt-4">
-        <div class="block bg-white rounded-xl p-4">
-          <div class="py-2">
-            <span class="font-bold text-base">Link tham khảo</span>
-          </div>
-
-          <a
-            :href="formData.accomodation.referenceUrl"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center p-4 bg-gradient-to-r from-teal-50 to-green-50 rounded-lg border border-teal-200 hover:border-teal-300 hover:shadow-md transition-all cursor-pointer group"
+        <div v-if="formData.sizeInventories && formData.sizeInventories.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div
+            v-for="sizeInventory in formData.sizeInventories"
+            :key="sizeInventory.id"
+            class="flex flex-col items-center p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 hover:border-blue-300 hover:shadow-md transition-all"
           >
-            <!-- Link Icon -->
-            <div
-              class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-3"
-            >
-              <svg
-                class="w-6 h-6 text-teal-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                ></path>
-              </svg>
+            <!-- Size -->
+            <div class="text-sm font-semibold text-blue-800 mb-1">
+              Size {{ sizeInventory.size?.name || 'N/A' }}
             </div>
+            
+            <!-- Số lượng -->
+            <div class="text-lg font-bold text-blue-600">
+              {{ sizeInventory.quantity || 0 }}
+            </div>
+            
+            <!-- Label -->
+            <div class="text-xs text-gray-500 mt-1">
+              {{ sizeInventory.quantity > 0 ? 'Còn hàng' : 'Hết hàng' }}
+            </div>
+          </div>
+        </div>
 
-            <!-- Link Info -->
-            <div class="flex-1 min-w-0">
-              <span
-                class="block text-teal-600 group-hover:text-teal-800 font-medium text-sm mb-1"
-              >
-                Đường dẫn tới tài liệu tham khảo
-              </span>
-              <p class="text-xs text-gray-500">Click để xem chi tiết</p>
-            </div>
+        <div v-else class="text-center py-8 text-gray-500">
+          <div class="text-lg">Không có thông tin tồn kho size</div>
+          <div class="text-sm mt-1">Sản phẩm có thể không phải là quần áo hoặc chưa có dữ liệu tồn kho</div>
+        </div>
 
-            <!-- External Link Icon -->
-            <div class="flex-shrink-0 ml-2">
-              <svg
-                class="w-4 h-4 text-teal-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                ></path>
-              </svg>
-            </div>
-          </a>
+        <!-- Tổng tồn kho -->
+        <div v-if="formData.sizeInventories && formData.sizeInventories.length > 0" class="mt-4 p-3 bg-gray-50 rounded-lg">
+          <div class="flex justify-between items-center">
+            <span class="font-semibold text-gray-700">Tổng tồn kho:</span>
+            <span class="font-bold text-lg text-green-600">
+              {{ totalInventory }} sản phẩm
+            </span>
+          </div>
         </div>
       </div>
 
+     
       <!-- Các nút hành động -->
       <div class="pt-10" v-if="displayStatus === 'Chờ duyệt'">
         <div class="flex space-x-5">
@@ -380,9 +310,9 @@ import {
 import { message } from "ant-design-vue";
 import { Check as CheckIcon } from "lucide-vue-next";
 import { getDetailProduct, approveProduct } from "@/apis/productService.js";
-import { downloadDoc } from "@/apis/documentService.js";
 
-const documents = ref([]);
+
+const products = ref([]);
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -418,12 +348,19 @@ const prevImage = () => {
 const formData = reactive({
   title: "",
   content: "",
+
   approved: false,
   notApproved: false,
   del: false,
-  accomodation: {
+  sizeInventories: [],
+  criteria: {
     firstClass: "",
-    secondMotel: "",
+    secondClass: "",
+    gender: "",
+    color: "",
+    material: "",
+      price: "",
+  originalPrice: "",
     address: "",
     idDistrict: "",
     openHours: "",
@@ -443,7 +380,7 @@ const mapAddress = ref("");
 const addressTimer = ref(null);
 
 watch(
-  () => formData.accomodation.address,
+  () => formData.criteria.address,
   (newAddress) => {
     if (addressTimer.value) clearTimeout(addressTimer.value);
     addressTimer.value = setTimeout(() => {
@@ -453,10 +390,13 @@ watch(
 );
 
 // Computed property hiển thị Hình thức
-const displayMotel = computed(() => {
-  if (formData.accomodation.firstClass === "TAI_LIEU") return "Tài liệu";
+const displayClass = computed(() => {
+  if (formData.criteria.firstClass === "QUAN_AO") return "Quần áo";
+   if (formData.criteria.firstClass === "TUI_XACH") return "Túi xách";
+    if (formData.criteria.firstClass === "PHU_KIEN") return "Phụ kiện";
+     
 
-  return formData.accomodation.firstClass;
+  return formData.criteria.firstClass;
 });
 
 // Computed property cho trạng thái bài đăng
@@ -475,8 +415,8 @@ const displayStatus = computed(() => {
 const displayVisibility = computed(() => (formData.del ? "Bị ẩn" : "Hiển thị"));
 
 // Computed property định nghĩa màu chữ cho Hình thức
-const motelColor = computed(() => {
-  if (formData.accomodation.firstClass === "TAI_LIEU") return "text-green-500";
+const classColor = computed(() => {
+  if (formData.criteria.firstClass === "TAI_LIEU") return "text-green-500";
 
   return "";
 });
@@ -496,11 +436,21 @@ const tagVisibilityColor = computed(() => {
   return "";
 });
 
+// Computed property tính tổng tồn kho
+const totalInventory = computed(() => {
+  if (!formData.sizeInventories || formData.sizeInventories.length === 0) {
+    return 0;
+  }
+  return formData.sizeInventories.reduce((total, item) => {
+    return total + (item.quantity || 0);
+  }, 0);
+});
+
 // Hàm tải tài liệu đã được cập nhật để sử dụng API downloadDoc
-async function handleDocumentClick(doc) {
+async function handleProductClick(doc) {
   try {
     console.log("💾 Tải tài liệu:", doc.file_name);
-    console.log("🆔 Document ID:", doc.id);
+    console.log("🆔 Product ID:", doc.id);
 
     // Gọi API downloadDoc thay vì fetch trực tiếp
     const response = await downloadDoc(doc.id);
@@ -557,15 +507,15 @@ async function handleDocumentClick(doc) {
 
     // Tạo URL tạm từ blob và tải về
     const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = product.createElement("a");
     link.href = url;
     link.download = downloadFileName; // ⭐ Quan trọng: download attribute
     link.style.display = "none"; // Ẩn link
 
     // Thêm vào DOM, click, rồi xóa ngay
-    document.body.appendChild(link);
+    product.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
+    product.body.removeChild(link);
 
     // Cleanup URL sau 1 giây
     setTimeout(() => {
@@ -587,13 +537,13 @@ async function handleDocumentClick(doc) {
 function getFileTypeText(fileTypeOrName) {
   if (typeof fileTypeOrName === "string") {
     const lower = fileTypeOrName.toLowerCase();
-    if (lower.includes("pdf")) return "PDF Document";
-    if (lower.includes("word")) return "Word Document";
+    if (lower.includes("pdf")) return "PDF Product";
+    if (lower.includes("word")) return "Word Product";
     if (lower.includes("presentation")) return "PowerPoint";
     if (lower.includes("spreadsheet")) return "Excel";
     if (lower.includes("x-zip-compressed")) return "Zip";
   }
-  return "Document";
+  return "Product";
 }
 
 // Hàm duyệt bài
@@ -625,24 +575,32 @@ const fetchProductDetails = async (id) => {
   try {
     const response = await getDetailProduct(id);
     const data = response.data || {};
+    
     formData.title = data.title || "";
     formData.content = data.content || "";
     formData.approved = data.approved ?? false;
     formData.notApproved = data.notApproved ?? false;
     formData.del = data.del ?? false;
-    if (data.accomodationDTO) {
-      Object.assign(formData.accomodation, data.accomodationDTO);
-      if (data.accomodationDTO.district && data.accomodationDTO.district.id) {
-        formData.accomodation.idDistrict = data.accomodationDTO.district.id;
+    
+    // Handle size inventories - check both possible field names
+    formData.sizeInventories = data.sizeInventories || data.inventories || [];
+    
+    if (data.criteriaDTO) {
+      Object.assign(formData.criteria, data.criteriaDTO);
+      if (data.criteriaDTO.district && data.criteriaDTO.district.id) {
+        formData.criteria.idDistrict = data.criteriaDTO.district.id;
       }
     }
+    
+ 
+    
     // Nếu API trả về mảng hình ảnh thì cập nhật lại galleryImages
     if (data.imageStrings) {
       galleryImages.value = data.imageStrings;
       // Reset currentImageIndex về 0 nếu cần
       currentImageIndex.value = 0;
     }
-    documents.value = data.documents || [];
+    products.value = data.products || [];
   } catch (error) {
     console.error("Lỗi tải thông tin bài đăng:", error);
     message.error("Không thể tải thông tin bài đăng.");
