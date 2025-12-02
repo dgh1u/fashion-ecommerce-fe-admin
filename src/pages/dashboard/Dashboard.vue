@@ -269,13 +269,13 @@ const availableMonths = ref([
 
 async function fetchPendingProducts() {
   try {
-    // Truyền params: approved = true và notApproved = true
-    const res = await getListProduct({ approved: true, notApproved: true });
+    // Lấy tất cả sản phẩm đang hiển thị
+    const res = await getListProduct({ del: false });
 
     // Giả sử API trả về danh sách bài viết trong res.data
     pendingProductCount.value = res.data?.total || 0;
   } catch (error) {
-    console.error("Lỗi khi lấy bài viết chưa duyệt:", error);
+    console.error("Lỗi khi lấy bài viết:", error);
   }
 }
 

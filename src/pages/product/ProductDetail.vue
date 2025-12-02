@@ -43,15 +43,6 @@
           </div>
         </div>
 
-        <!-- Trạng thái -->
-        <div class="py-2">
-          <label>Trạng thái</label>
-          <div class="flex rounded-lg mt-1 p-2">
-            <a-tag :color="tagStatusColor" class="font-bold">{{
-              displayStatus
-            }}</a-tag>
-          </div>
-        </div>
         <!-- Hiển thị -->
         <div class="py-2">
           <label>Hiển thị</label>
@@ -251,48 +242,40 @@
         </div>
       </div>
 
+      <!-- Nút Ẩn/Hiển thị sản phẩm -->
+      <div class="pt-10">
+        <div class="flex justify-center">
+          <button
+            v-if="!formData.del"
+            @click="handleToggleVisibility"
+            :disabled="isTogglingVisibility"
+            class="flex items-center gap-2 px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed"
+          >
+            <svg v-if="!isTogglingVisibility" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+              <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+              <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+              <line x1="2" y1="2" x2="22" y2="22"></line>
+            </svg>
+            <div v-else class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+            {{ isTogglingVisibility ? 'Đang xử lý...' : 'Ẩn sản phẩm' }}
+          </button>
+          <button
+            v-else
+            @click="handleToggleVisibility"
+            :disabled="isTogglingVisibility"
+            class="flex items-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:transform-none disabled:cursor-not-allowed"
+          >
+            <svg v-if="!isTogglingVisibility" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <div v-else class="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+            {{ isTogglingVisibility ? 'Đang xử lý...' : 'Hiển thị sản phẩm' }}
+          </button>
+        </div>
+      </div>
      
-      <!-- Các nút hành động -->
-      <div class="pt-10" v-if="displayStatus === 'Chờ duyệt'">
-        <div class="flex space-x-5">
-          <div class="flex-1 text-white font-semibold">
-            <button
-              @click="handleBlock"
-              class="px-3 py-2 bg-red-500 text-white rounded-lg w-full"
-            >
-              Khóa bài
-            </button>
-          </div>
-          <div class="flex-1 text-white font-semibold">
-            <button
-              @click="handleApprove"
-              class="px-3 py-2 bg-green-500 text-white rounded-lg w-full"
-            >
-              Duyệt bài
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="pt-10" v-else-if="displayStatus === 'Đã duyệt'">
-        <div class="flex text-white font-semibold">
-          <button
-            @click="handleBlock"
-            class="w-full px-3 py-2 bg-red-500 text-white rounded-lg"
-          >
-            Khóa bài
-          </button>
-        </div>
-      </div>
-      <div class="pt-10" v-else-if="displayStatus === 'Bị khóa'">
-        <div class="flex text-white font-semibold">
-          <button
-            @click="handleApprove"
-            class="w-full px-3 py-2 bg-green-500 text-white rounded-lg"
-          >
-            Mở khóa
-          </button>
-        </div>
-      </div>
     </div>
   </a-modal>
 </template>
@@ -309,7 +292,7 @@ import {
 } from "vue";
 import { message } from "ant-design-vue";
 import { Check as CheckIcon } from "lucide-vue-next";
-import { getDetailProduct, approveProduct } from "@/apis/productService.js";
+import { getDetailProduct, hideProduct } from "@/apis/productService.js";
 
 
 const products = ref([]);
@@ -327,6 +310,9 @@ const modalVisible = computed({
 
 // Biến chứa danh sách URL hình ảnh dạng gallery
 const galleryImages = ref([]);
+
+// Biến loading state cho toggle visibility
+const isTogglingVisibility = ref(false);
 
 // Biến điều hướng ảnh
 const currentImageIndex = ref(0);
@@ -348,9 +334,6 @@ const prevImage = () => {
 const formData = reactive({
   title: "",
   content: "",
-
-  approved: false,
-  notApproved: false,
   del: false,
   sizeInventories: [],
   criteria: {
@@ -399,18 +382,6 @@ const displayClass = computed(() => {
   return formData.criteria.firstClass;
 });
 
-// Computed property cho trạng thái bài đăng
-const displayStatus = computed(() => {
-  if (formData.approved === true && formData.notApproved === false) {
-    return "Đã duyệt";
-  } else if (formData.approved === true && formData.notApproved === true) {
-    return "Chờ duyệt";
-  } else if (formData.approved === false) {
-    return "Bị khóa";
-  }
-  return "";
-});
-
 // Computed property cho hiển thị: nếu del=false: "Hiển thị", nếu del=true: "Bị ẩn"
 const displayVisibility = computed(() => (formData.del ? "Bị ẩn" : "Hiển thị"));
 
@@ -418,14 +389,6 @@ const displayVisibility = computed(() => (formData.del ? "Bị ẩn" : "Hiển t
 const classColor = computed(() => {
   if (formData.criteria.firstClass === "TAI_LIEU") return "text-green-500";
 
-  return "";
-});
-
-// Computed property định nghĩa màu cho Trạng thái (Tag của antd)
-const tagStatusColor = computed(() => {
-  if (displayStatus.value === "Đã duyệt") return "green";
-  if (displayStatus.value === "Chờ duyệt") return "gold";
-  if (displayStatus.value === "Bị khóa") return "red";
   return "";
 });
 
@@ -546,27 +509,23 @@ function getFileTypeText(fileTypeOrName) {
   return "Product";
 }
 
-// Hàm duyệt bài
-const handleApprove = async () => {
+// Hàm toggle ẩn/hiển thị sản phẩm
+const handleToggleVisibility = async () => {
+  if (isTogglingVisibility.value) return; // Prevent multiple clicks
+  
   try {
-    await approveProduct(props.productId, true);
-    message.success("Bài đăng đã được duyệt");
-    fetchProductDetails(props.productId);
+    isTogglingVisibility.value = true;
+    await hideProduct(props.productId);
+    const action = formData.del ? "hiển thị" : "ẩn";
+    message.success(`Sản phẩm đã được ${action} thành công`);
+    
+    // Cập nhật lại thông tin sản phẩm
+    await fetchProductDetails(props.productId);
   } catch (error) {
-    console.error("Lỗi duyệt bài:", error);
-    message.error("Lỗi duyệt bài");
-  }
-};
-
-// Hàm khóa bài
-const handleBlock = async () => {
-  try {
-    await approveProduct(props.productId, false);
-    message.success("Bài đăng đã bị khóa");
-    fetchProductDetails(props.productId);
-  } catch (error) {
-    console.error("Lỗi khóa bài:", error);
-    message.error("Lỗi khóa bài");
+    console.error("Lỗi khi thay đổi trạng thái hiển thị:", error);
+    message.error("Có lỗi xảy ra khi thay đổi trạng thái hiển thị");
+  } finally {
+    isTogglingVisibility.value = false;
   }
 };
 
@@ -578,8 +537,6 @@ const fetchProductDetails = async (id) => {
     
     formData.title = data.title || "";
     formData.content = data.content || "";
-    formData.approved = data.approved ?? false;
-    formData.notApproved = data.notApproved ?? false;
     formData.del = data.del ?? false;
     
     // Handle size inventories - check both possible field names

@@ -3,13 +3,8 @@
     class="flex items-center justify-center min-h-screen bg-gradient-to-t from-sky-200 to-sky-100"
   >
     <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-2xl">
-      <!-- Logo -->
-      <div class="flex justify-center mb-4 gap-x-4">
-        <img
-          src="@/assets/logo-admin.png"
-          alt="Logo"
-          class="w-12 h-14 object-contain"
-        />
+        <div class="logo-text-footer pb-4">
+        <div class="host-footer">28.Host</div>
       </div>
 
       <!-- Title -->
@@ -183,4 +178,16 @@ const handleLogin = async () => {
 
 <style scoped>
 @import "@/style.css";
+.host-footer {
+  font-size: 2.2em;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #000000;
+}
+.logo-text-footer {
+  font-family: "Kaushan Script", cursive;
+  line-height: 1;
+  text-align: center;
+}
+
 </style>

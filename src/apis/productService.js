@@ -52,10 +52,10 @@ export const updateProduct = async (id, data) => {
   });
 };
 
-// Duyệt/Khóa một bài đăng (Admin only)
-export const approveProduct = async (id, bool) => {
+// Ẩn/Hiển thị sản phẩm (Toggle visibility)
+export const hideProduct = async (id) => {
   return axios({
-    url: `/api/product/${id}/approve/${bool}`,
+    url: `/api/product/hide/${id}`,
     method: "PUT",
   });
 };

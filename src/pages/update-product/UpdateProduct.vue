@@ -236,27 +236,13 @@
         <div>• Không chèn văn bản, số điện thoại lên ảnh</div>
       </div>
 
-      <!-- Uploaded Images Display -->
-      <div v-if="uploadedImages.length > 0" class="grid grid-cols-2 gap-4">
-        <div
-          v-for="(image, index) in uploadedImages"
-          :key="index"
-          class="relative h-32 rounded-lg overflow-hidden border"
-        >
-          <img
-            :src="image.preview"
-            alt="preview"
-            class="w-full h-full object-cover"
-          />
-          <button
-            @click="removeUploadedImage(index)"
-            class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center space-x-1 px-2 py-1 bg-white bg-opacity-90 rounded-md text-red-500 hover:text-red-600 text-xs"
-          >
-            <Trash2 class="w-3 h-3" />
-            <span>Xóa</span>
-          </button>
-        </div>
-      </div>
+      <!-- Uploaded Images Display with Sorting -->
+      <ImageSorter
+        :images="uploadedImages"
+        @update:images="uploadedImages = $event"
+        @remove-image="removeUploadedImage"
+        @order-changed="handleImageOrderChanged"
+      />
 
       <!-- Image Counter -->
       <div class="mt-4 text-sm text-gray-600 text-center">
@@ -295,9 +281,11 @@ import {
   getImageDTOByProduct,
   deleteImagesByProduct,
   uploadMultipleImages,
+  updateImageOrder,
 } from "@/apis/imageService.js";
 import { updateProductInventory } from "@/apis/sizeService.js";
 import { FolderUp, Trash2 } from "lucide-vue-next";
+import ImageSorter from "@/components/ImageSorter.vue";
 
 // Import các component của Ant Design Vue
 import { Select, message, Modal } from "ant-design-vue";
@@ -404,6 +392,25 @@ const removeUploadedImage = (index) => {
   }
 };
 
+// Xử lý thay đổi thứ tự ảnh
+const handleImageOrderChanged = async (reorderedImages) => {
+  try {
+    // Lấy danh sách ID của các ảnh đã có trên server (có id)
+    const imageIds = reorderedImages
+      .filter(img => img.id) // Chỉ lấy các ảnh đã upload
+      .map(img => img.id);
+    
+    if (imageIds.length > 0) {
+      await updateImageOrder(productId, imageIds);
+      console.log('Đã cập nhật thứ tự ảnh thành công');
+      message.success('Đã cập nhật thứ tự ảnh thành công');
+    }
+  } catch (error) {
+    console.error('Lỗi khi cập nhật thứ tự ảnh:', error);
+    message.error('Lỗi khi cập nhật thứ tự ảnh');
+  }
+};
+
 // Helper function to convert base64 to file
 function base64ToFile(base64, fileName, fileType) {
   const byteCharacters = atob(base64);
@@ -438,8 +445,11 @@ onMounted(async () => {
     console.log("Response từ getImageDTOByProduct:", imgRes);
 
     if (imgRes && Array.isArray(imgRes) && imgRes.length > 0) {
+      // Sắp xếp theo orderIndex trước khi load
+      const sortedImages = imgRes.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+      
       // Load tất cả ảnh, không chỉ ảnh đầu tiên
-      uploadedImages.value = imgRes.map((img) => {
+      uploadedImages.value = sortedImages.map((img) => {
         const previewUrl = `data:${img.fileType};base64,${img.uri}`;
         return {
           id: img.id,
@@ -447,6 +457,8 @@ onMounted(async () => {
           fileType: img.fileType,
           base64: img.uri,
           preview: previewUrl,
+          uri: img.uri,
+          orderIndex: img.orderIndex || 0,
           isExisting: true,
         };
       });

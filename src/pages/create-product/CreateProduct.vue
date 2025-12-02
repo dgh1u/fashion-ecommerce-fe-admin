@@ -1,7 +1,7 @@
 <template>
   <div class="create-product max-w-3xl mx-auto space-y-4">
     <div class="flex items-center pb-4 justify-center">
-      <span class="font-bold text-3xl text-black">Đăng tải sản phẩm</span>
+      <span class="font-bold text-3xl text-black pt-6">Đăng tải sản phẩm</span>
     </div>
     <div class="block bg-white p-4 pb-6 rounded-xl">
       <div class="py-2">
@@ -228,27 +228,13 @@
         <div>• Không chèn văn bản, số điện thoại lên ảnh</div>
       </div>
 
-      <!-- Uploaded Images Display -->
-      <div v-if="uploadedImages.length > 0" class="grid grid-cols-2 gap-4">
-        <div
-          v-for="(image, index) in uploadedImages"
-          :key="index"
-          class="relative h-32 rounded-lg overflow-hidden border"
-        >
-          <img
-            :src="image.preview"
-            alt="preview"
-            class="w-full h-full object-cover"
-          />
-          <button
-            @click="removeUploadedImage(index)"
-            class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center space-x-1 px-2 py-1 bg-white bg-opacity-90 rounded-md text-red-500 hover:text-red-600 text-xs"
-          >
-            <Trash2 class="w-3 h-3" />
-            <span>Xóa</span>
-          </button>
-        </div>
-      </div>
+      <!-- Uploaded Images Display with Sorting -->
+      <ImageSorter
+        :images="uploadedImages"
+        @update:images="uploadedImages = $event"
+        @remove-image="removeUploadedImage"
+        @order-changed="handleImageOrderChanged"
+      />
 
       <!-- Image Counter -->
       <div class="mt-4 text-sm text-gray-600 text-center">
@@ -291,8 +277,8 @@ const { confirm } = Modal;
 const { Option: ASelectOption } = Select;
 import { Check as CheckIcon, FolderUp, Trash2 } from "lucide-vue-next";
 
-
 import SizeInventoryForm from "@/components/SizeInventoryForm.vue";
+import ImageSorter from "@/components/ImageSorter.vue";
 
 // Import các component của Ant Design Vue trực tiếp trong setup
 const ASelect = Select;
@@ -506,6 +492,13 @@ const removeUploadedImage = (index) => {
     URL.revokeObjectURL(uploadedImages.value[index].preview);
     uploadedImages.value.splice(index, 1);
   }
+};
+
+// Xử lý thay đổi thứ tự ảnh (trong CreateProduct, chỉ cần update local array)
+const handleImageOrderChanged = (reorderedImages) => {
+  // Trong trang tạo mới, chỉ cần cập nhật thứ tự local
+  // Thứ tự sẽ được duy trì khi upload lên server
+  console.log('Thứ tự ảnh đã được thay đổi:', reorderedImages);
 };
 
 const handleTimeChange = (time) => {

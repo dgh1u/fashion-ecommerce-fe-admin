@@ -3,8 +3,7 @@
     <!-- Logo -->
     <div class="flex items-center justify-center h-28 mt-4 mb-6">
       <div class="logo-text-footer">
-        <div class="tuan-footer">TUAN</div>
-        <div class="fashion-footer">Fashion</div>
+        <div class="host-footer">28.Host</div>
       </div>
     </div>
 
@@ -30,13 +29,14 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { Wallet, Users, FileText, ChartPie, Activity, Package, PackagePlus } from "lucide-vue-next";
+import { Wallet, Users, FileText, ChartPie, Activity, Package, PackagePlus, ShoppingCart } from "lucide-vue-next";
 
 const menuItems = [
-  { label: "Tổng quan", path: "/home/dashboard", icon: ChartPie },
-  { label: "Hoạt động", path: "/home/action", icon: Activity },
-  { label: "Người dùng", path: "/home/user", icon: Users },
-  { label: "Nạp tiền", path: "/home/payment", icon: Wallet },
+  { label: "Thống kê", path: "/home/dashboard", icon: ChartPie },
+  { label: "Quản lý hoạt động", path: "/home/action", icon: Activity },
+  { label: "Quản lý người dùng", path: "/home/user", icon: Users },
+  { label: "Quản lý giao dịch", path: "/home/payment", icon: Wallet },
+  { label: "Quản lý đơn hàng", path: "/home/order", icon: ShoppingCart },
   { label: "Đăng sản phẩm", path: "/home/create-product", icon: PackagePlus},
   { label: "Quản lý sản phẩm", path: "/home/product", icon: Package },
 ];
@@ -55,23 +55,18 @@ const openKeys = ref(["product"]);
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap');
+
 .logo-text-footer {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Kaushan Script", cursive;
   line-height: 1;
   text-align: center;
 }
 
-.tuan-footer {
-  font-size: 2.5em;
-  font-weight: 900;
+.host-footer {
+  font-size: 2.2em;
+  font-weight: 700;
   letter-spacing: 1px;
-  color: #000000; /* Chữ đen */
-}
-
-.fashion-footer {
-  font-size: 1.6em;
-  font-weight: 600;
-  letter-spacing: 1px;
-  color: #000000; /* Chữ đen */
+  color: #000000;
 }
 </style>

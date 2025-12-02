@@ -51,6 +51,11 @@ export const getImageByProduct = async (idProduct) => {
   });
 };
 
+// Alias for getting images by product ID
+export const getImageByIdProduct = async (idProduct) => {
+  return getImageByProduct(idProduct);
+};
+
 // Tải về một ảnh (responseType = blob để xử lý file nhị phân)
 export const downloadImage = async (fileId) => {
   return axios({
@@ -68,4 +73,14 @@ export const getImagesByProductId = async (idProduct) => {
 
 export const deleteImagesByProductId = async (idProduct) => {
   return deleteImagesByProduct(idProduct);
+};
+
+// Cập nhật thứ tự ảnh cho sản phẩm
+export const updateImageOrder = async (idProduct, imageIds) => {
+  return axios({
+    url: `/api/updateImageOrder/product/${idProduct}`,
+    method: "PUT",
+    data: imageIds,
+    headers: { "Content-Type": "application/json" },
+  });
 };

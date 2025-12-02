@@ -63,6 +63,9 @@ import {
   Utensils,
   Store,
   FileText,
+  ShoppingCart,
+  PackagePlus,
+  Package,
 } from "lucide-vue-next";
 
 const route = useRoute();
@@ -73,19 +76,14 @@ const authStore = useAuthStore();
 const avatarUrl = computed(() => authStore.avatar);
 
 const pageTitles = {
-  "/home/dashboard": { title: "TỔNG QUAN", icon: ChartPie },
-  "/home/action": { title: "HOẠT ĐỘNG", icon: Activity },
-  "/home/user": { title: "NGƯỜI DÙNG", icon: Users },
-  "/home/payment": { title: "NẠP TIỀN", icon: Wallet },
-  "/home/product/class": { title: "TIN ĐĂNG NHÀ TRỌ", icon: House },
-  "/home/product/food-beverage": {
-    title: "TIN ĐĂNG ĂN UỐNG",
-    icon: Utensils,
-  },
-  "/home/product/store-utility": {
-    title: "TIN ĐĂNG CỬA HÀNG - TIỆN ÍCH",
-    icon: Store,
-  },
+  "/home/dashboard": { title: "Thống kê", icon: ChartPie },
+  "/home/action": { title: "Quản lý hoạt động", icon: Activity },
+  "/home/user": { title: "Quản lý người dùng", icon: Users },
+  "/home/payment": { title: "Quản lý giao dịch", icon: Wallet },
+  "/home/order": { title: "Quản lý đơn hàng", icon: ShoppingCart },
+  "/home/create-product": { title: "Đăng sản phẩm", icon: PackagePlus},
+  "/home/product": { title: "Quản lý sản phẩm", icon: Package },
+
 };
 
 //  Xác định trang hiện tại

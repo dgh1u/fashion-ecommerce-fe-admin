@@ -11,6 +11,7 @@ import CreateProduct from "../pages/create-product/CreateProduct.vue";
 import UpdateProduct from "../pages/update-product/UpdateProduct.vue";
 import ProductManagement from "../pages/product/ProductManagement.vue";
 import ProductDetail from "../pages/product/ProductDetail.vue";
+import OrderManagement from "../pages/order/OrderManagement.vue";
 
 
 export default [
@@ -26,6 +27,12 @@ export default [
         path: "payment",
         name: "PaymentManagement",
         component: PaymentManagement,
+        meta: { requiresAuth: false },
+      },
+      {
+        path: "order",
+        name: "OrderManagement",
+        component: OrderManagement,
         meta: { requiresAuth: false },
       },
       {

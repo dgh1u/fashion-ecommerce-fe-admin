@@ -36,17 +36,7 @@
         </a-select>
 
         <!-- Bộ lọc trạng thái -->
-        <a-select
-          v-model:value="selectedStatus"
-          placeholder="Trạng thái"
-          style="width: 120px"
-          @change="handleFilterChange"
-        >
-          <a-select-option :value="null">Tất cả</a-select-option>
-          <a-select-option :value="'APPROVED'">Đã duyệt</a-select-option>
-          <a-select-option :value="'BLOCKED'">Bị khóa</a-select-option>
-          <a-select-option :value="'PENDING'">Chờ duyệt</a-select-option>
-        </a-select>
+        <!-- Loại bỏ filter theo trạng thái duyệt -->
 
         <!-- Bộ lọc Hiển thị -->
         <a-select
@@ -135,26 +125,6 @@
         </template>
 
         <!-- Trạng thái duyệt -->
-        <template v-if="column.key === 'approved'">
-          <a-tag
-            :color="
-              record.approved && !record.notApproved
-                ? 'green'
-                : record.approved && record.notApproved
-                ? 'orange'
-                : 'red'
-            "
-          >
-            {{
-              record.approved && !record.notApproved
-                ? "Đã duyệt"
-                : record.approved && record.notApproved
-                ? "Chờ duyệt"
-                : "Bị khóa"
-            }}
-          </a-tag>
-        </template>
-
         <!-- Cột Hiển thị -->
         <template v-if="column.key === 'del'">
           <a-tag :color="record.del ? 'red' : 'green'">
@@ -215,7 +185,6 @@ export default {
     const products = ref([]);
     const loading = ref(false);
     const searchText = ref("");
-    const selectedStatus = ref(null);
     const pagination = ref({
       current: 1,
       pageSize: 6,
@@ -238,7 +207,6 @@ export default {
       { title: "Loại hình", dataIndex: "firstClass", key: "firstClass" },
       { title: "Phân loại", dataIndex: "secondClass", key: "secondClass" },
       { title: "Ngày tạo", dataIndex: "createAt", key: "createAt" },
-      { title: "Trạng thái", key: "approved" },
       { title: "Người đăng", key: "user" },
       { title: "Hiển thị", dataIndex: "del", key: "del" }, // Cột hiển thị
       // Cột người đăng
@@ -254,23 +222,6 @@ export default {
           limit: pagination.value.pageSize,
           keywords: searchText.value.trim(),
         };
-
-        // Logic lọc trạng thái
-        switch (selectedStatus.value) {
-          case "APPROVED":
-            params.approved = true;
-            params.notApproved = false;
-            break;
-          case "BLOCKED":
-            params.approved = false;
-            break;
-          case "PENDING":
-            params.approved = true;
-            params.notApproved = true;
-            break;
-          default:
-            break;
-        }
 
         // Lọc theo UserId
         if (selectedUserId.value) {
@@ -362,7 +313,6 @@ export default {
       columns,
       loading,
       searchText,
-      selectedStatus,
       pagination,
       fetchProducts,
       handleTableChange,
