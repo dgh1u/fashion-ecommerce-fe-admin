@@ -80,18 +80,16 @@
         </template>
 
         <template v-if="column.key === 'firstClass'">
-          <span
-            :style="{
-              color:
-                record.criteriaDTO && record.criteriaDTO.firstClass === 'QUAN_AO'
-                  ? 'green'
-                  : record.criteriaDTO && record.criteriaDTO.firstClass === 'TUI_XACH'
-                  ? 'blue'
-                  : record.criteriaDTO && record.criteriaDTO.firstClass === 'PHU_KIEN'
-                  ? 'orange'
-                  : 'black',
-              fontWeight: 'bold',
-            }"
+          <a-tag
+            :color="
+              record.criteriaDTO && record.criteriaDTO.firstClass === 'QUAN_AO'
+                ? 'green'
+                : record.criteriaDTO && record.criteriaDTO.firstClass === 'TUI_XACH'
+                ? 'blue'
+                : record.criteriaDTO && record.criteriaDTO.firstClass === 'PHU_KIEN'
+                ? 'orange'
+                : 'default'
+            "
           >
             {{
               record.criteriaDTO && record.criteriaDTO.firstClass === "QUAN_AO"
@@ -102,7 +100,7 @@
                 ? "Phụ kiện"
                 : "Không xác định"
             }}
-          </span>
+          </a-tag>
         </template>
 
         <template v-if="column.key === 'secondClass'">

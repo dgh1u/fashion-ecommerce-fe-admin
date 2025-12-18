@@ -4,26 +4,19 @@
     <div class="mb-8">
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <!-- Welcome Section -->
-        <div class="mb-6 lg:mb-0">
-          <div class="flex items-center space-x-3 mb-2">
+        <div class=" lg:mb-0">
+          <div class="flex items-center space-x-3 ">
             <div class="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
               <IconUsers class="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              <h1 class="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                 Chào mừng, {{ fullName }}
               </h1>
-              <p class="text-gray-500 text-sm font-medium">Bảng điều khiển quản trị</p>
+              <p class="text-gray-500 text-sm font-medium">Tổng quan hệ thống </p>
             </div>
           </div>
-          <div class="flex items-center space-x-2 mt-3">
-            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          
-              <span class="text-orange-600 font-semibold">
-                {{ pendingProductCount }} bài viết chờ duyệt
-              </span>
-          
-          </div>
+    
         </div>
 
         <!-- Control Panel -->

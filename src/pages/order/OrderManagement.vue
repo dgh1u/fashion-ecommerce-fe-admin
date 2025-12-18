@@ -89,7 +89,7 @@
           </span>
         </template>
 
-        <!-- Thông tin khách hàng -->
+        <!-- Thông tin người dùng -->
         <template v-if="column.key === 'customer'">
           <div class="space-y-1">
             <div class="font-medium">{{ record.customerName }}</div>
@@ -209,7 +209,7 @@ export default {
     const columns = [
       { title: "STT", key: "stt", width: 60, fixed: 'left' },
       { title: "Mã đơn hàng", key: "orderCode", width: 120 },
-      { title: "Thông tin khách hàng", key: "customer", width: 200 },
+      { title: "Thông tin người dùng", key: "customer", width: 200 },
       { title: "Người đặt", key: "user", width: 180 },
       { title: "Tổng tiền", key: "totalAmount", width: 120 },
       { title: "Trạng thái", key: "status", width: 120 },

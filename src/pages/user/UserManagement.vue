@@ -23,18 +23,7 @@
           </template>
         </a-input>
 
-        <!-- Bộ lọc trạng thái -->
-
-        <a-select
-          v-model:value="selectedStatus"
-          placeholder="Lọc theo trạng thái"
-          style="width: 100px"
-          @change="handleFilterChange"
-        >
-          <a-select-option :value="null">Tất cả</a-select-option>
-          <a-select-option :value="'false'">Hoạt động</a-select-option>
-          <a-select-option :value="'true'">Bị khóa</a-select-option>
-        </a-select>
+       
         <!-- Bộ lọc vai trò -->
         <a-select
           v-model:value="selectedRole"
@@ -44,8 +33,7 @@
         >
           <a-select-option :value="null">Tất cả</a-select-option>
           <a-select-option value="ADMIN">Admin</a-select-option>
-          <a-select-option value="CUSTOMER">Khách hàng</a-select-option>
-          <a-select-option value="EMPLOYEE">Nhân viên</a-select-option>
+          <a-select-option value="CUSTOMER">Người dùng</a-select-option>
         </a-select>
       </div>
 
@@ -73,27 +61,30 @@
         <!-- Vai trò -->
 
         <template v-if="column.key === 'role'">
-          <span
-            :style="{
-              color:
-                record.role?.roleId === 'ADMIN'
-                  ? 'red'
-                  : record.role?.roleId === 'EMPLOYEE'
-                  ? 'green'
-                  : 'blue',
-              fontWeight: 'bold',
-            }"
+          <a-tag 
+            v-if="record.role?.roleId === 'ADMIN'" 
+            color="red"
           >
-            {{ record.role?.name || "Không có vai trò" }}
-          </span>
-        </template>
-
-        <!-- Trạng thái khóa -->
-        <template v-if="column.key === 'block'">
-          <a-tag :color="record.block ? 'red' : 'green'">
-            {{ record.block ? "Bị khóa" : "Hoạt động" }}
+            Admin
+          </a-tag>
+          <a-tag 
+            v-else-if="record.role?.roleId === 'CUSTOMER'" 
+            color="blue"
+          >
+            Người dùng
+          </a-tag>
+          <a-tag 
+            v-else-if="record.role?.roleId === 'EMPLOYEE'" 
+            color="green"
+          >
+            Nhân viên
+          </a-tag>
+          <a-tag v-else color="default">
+            Không có vai trò
           </a-tag>
         </template>
+
+       
 
         <!-- Hành động -->
         <template v-if="column.key === 'action'">
@@ -103,9 +94,7 @@
           <a-button type="link" @click="openEditUserPopup(record)">
             <template #icon><EditOutlined /></template>
           </a-button>
-          <a-button type="link" danger @click="confirmDelete(record)">
-            <template #icon><DeleteOutlined /></template>
-          </a-button>
+          
         </template>
       </template>
     </a-table>
@@ -179,7 +168,6 @@ export default {
       { title: "Địa chỉ", dataIndex: "address", key: "address" },
       { title: "Số điện thoại", dataIndex: "phone", key: "phone" },
 
-      { title: "Trạng thái", dataIndex: "block", key: "block" },
       { title: "Hành động", key: "action", width: 140 },
     ];
 

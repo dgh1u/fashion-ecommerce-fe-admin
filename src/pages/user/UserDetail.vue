@@ -53,13 +53,7 @@
               class="custom-input"
             />
           </a-form-item>
-          <a-form-item label="Số dư tài khoản">
-            <a-input
-              :value="userDetail.balance"
-              disabled
-              class="custom-input"
-            />
-          </a-form-item>
+          <
         </div>
 
         <!-- Cột phải -->
@@ -84,11 +78,7 @@
             </a-tag>
           </a-form-item>
 
-          <a-form-item label="Trạng thái">
-            <a-tag :color="userDetail.block ? 'red' : 'green'">
-              {{ userDetail.block ? "Bị khóa" : "Hoạt động" }}
-            </a-tag>
-          </a-form-item>
+          
         </div>
       </div>
     </a-form>

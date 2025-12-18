@@ -7,11 +7,12 @@
     </div>
 
     <!--  Thông tin người dùng bên phải -->
-    <div class="flex items-center gap-4">
-      <span class="text-gray-700 text-lg">{{ fullName }}</span>
+    <div class="flex items-center gap-2">
+     
 
       <!-- Dropdown Avatar -->
       <div class="relative">
+        
         <div @click="toggleDropdown" class="cursor-pointer">
           <img
             v-if="avatarUrl"
@@ -25,6 +26,7 @@
           >
             <span class="text-gray-700">?</span>
           </div>
+          
         </div>
 
         <!-- Dropdown Menu -->
@@ -41,6 +43,7 @@
           </button>
         </div>
       </div>
+       <span class="text-gray-500 text-sm">{{ fullName }}</span>
     </div>
   </div>
 </template>
@@ -76,7 +79,7 @@ const authStore = useAuthStore();
 const avatarUrl = computed(() => authStore.avatar);
 
 const pageTitles = {
-  "/home/dashboard": { title: "Thống kê", icon: ChartPie },
+  "/home/dashboard": { title: "Tổng quan hệ thống", icon: ChartPie },
   "/home/action": { title: "Quản lý hoạt động", icon: Activity },
   "/home/user": { title: "Quản lý người dùng", icon: Users },
   "/home/payment": { title: "Quản lý giao dịch", icon: Wallet },

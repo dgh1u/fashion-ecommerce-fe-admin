@@ -32,10 +32,10 @@ import { ref, computed } from "vue";
 import { Wallet, Users, FileText, ChartPie, Activity, Package, PackagePlus, ShoppingCart } from "lucide-vue-next";
 
 const menuItems = [
-  { label: "Thống kê", path: "/home/dashboard", icon: ChartPie },
-  { label: "Quản lý hoạt động", path: "/home/action", icon: Activity },
+  { label: "Dashboard", path: "/home/dashboard", icon: ChartPie },
+ 
   { label: "Quản lý người dùng", path: "/home/user", icon: Users },
-  { label: "Quản lý giao dịch", path: "/home/payment", icon: Wallet },
+  { label: "Lịch sử giao dịch", path: "/home/payment", icon: Wallet },
   { label: "Quản lý đơn hàng", path: "/home/order", icon: ShoppingCart },
   { label: "Đăng sản phẩm", path: "/home/create-product", icon: PackagePlus},
   { label: "Quản lý sản phẩm", path: "/home/product", icon: Package },

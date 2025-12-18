@@ -30,9 +30,7 @@
           <a-form-item label="Địa chỉ" name="address">
             <a-input v-model:value="userForm.address" />
           </a-form-item>
-          <a-form-item label="Số dư tài khoản" name="balance">
-            <a-input v-model:value="userForm.balance" />
-          </a-form-item>
+          
         </div>
 
         <!-- Cột phải -->
@@ -41,9 +39,7 @@
             <a-input v-model:value="userForm.phone" />
           </a-form-item>
 
-          <a-form-item label="Trạng thái khóa" name="block">
-            <a-switch v-model:checked="userForm.block" />
-          </a-form-item>
+         
 
           <a-form-item label="Vai trò" name="roleId" required>
             <a-select
@@ -51,7 +47,7 @@
               placeholder="Chọn vai trò"
             >
               <a-select-option value="ADMIN">Admin</a-select-option>
-              <a-select-option value="CUSTOMER">Khách hàng</a-select-option>
+              <a-select-option value="CUSTOMER">Người dùng</a-select-option>
             </a-select>
           </a-form-item>
         </div>

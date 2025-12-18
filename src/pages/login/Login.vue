@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center justify-center min-h-screen bg-gradient-to-t from-sky-200 to-sky-100"
+    class="flex items-center justify-center min-h-screen bg-login"
   >
     <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-2xl">
         <div class="logo-text-footer pb-4">
@@ -178,6 +178,12 @@ const handleLogin = async () => {
 
 <style scoped>
 @import "@/style.css";
+.bg-login {
+  background-image: url('@/assets/bg-login.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .host-footer {
   font-size: 2.2em;
   font-weight: 700;

@@ -40,15 +40,15 @@
         </div>
       </div>
 
-      <!-- Thông tin khách hàng -->
+      <!-- Thông tin người dùng -->
       <div class="bg-gray-50 p-4 rounded-lg">
         <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
           <UserOutlined class="text-green-500" />
-          Thông tin khách hàng
+          Thông tin người dùng
         </h3>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-500">Tên khách hàng</p>
+            <p class="text-sm text-gray-500">Tên người dùng</p>
             <p class="font-medium">{{ order.customerName }}</p>
           </div>
           <div>
