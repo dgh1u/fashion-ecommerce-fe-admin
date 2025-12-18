@@ -554,7 +554,6 @@ async function executeUpdateProduct() {
     }
 
     message.success("Cập nhật bài đăng thành công!");
-    router.push(`/product/${productId}`);
   } catch (error) {
     console.error("❌ Lỗi khi cập nhật bài đăng:", error);
     message.error("Đã có lỗi xảy ra khi cập nhật bài đăng");
